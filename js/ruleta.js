@@ -111,13 +111,9 @@ class Ruleta {
     }
 
     initEventListeners() {
-        // Solo botones de girar y reiniciar
+        // Solo botón de girar
         document.getElementById('spinButton').addEventListener('click', () => {
             this.girarRuleta();
-        });
-
-        document.getElementById('resetButton').addEventListener('click', () => {
-            this.reiniciarRuleta();
         });
     }
 
@@ -365,18 +361,6 @@ class Ruleta {
         const spinButton = document.getElementById('spinButton');
         spinButton.disabled = false;
         spinButton.textContent = '¡GIRAR RULETA!';
-    }
-
-    reiniciarRuleta() {
-        if (this.girando) return;
-
-        this.rotacionActual = 0;
-        this.dibujarRuleta();
-        
-        const result = document.getElementById('result');
-        result.textContent = '';
-        result.style.color = '';
-        result.classList.remove('winner-animation');
     }
 
     crearConfetti() {
