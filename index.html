@@ -6,27 +6,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
     <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="js/i18n.js"></script>
 </head>
 <body>
+    <!-- Partículas flotantes de fondo -->
+    <div class="floating-particles"></div>
+    
+    <!-- Controles superiores -->
+    <div class="top-controls">
+        <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+            <i class="fas fa-moon" id="theme-icon"></i>
+        </div>
+        <div class="language-selector">
+            <select id="language-select" onchange="changeLanguage(this.value)">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </div>
+
     <div class="container">
-        <h1 data-i18n="site.title">PSK - GAMES</h1>
-        <p class="subtitle" data-i18n="site.subtitle">Elige tu tipo de ruleta favorita</p>
+        <div class="header-section">
+            <h1 data-i18n="site.title">PSK - GAMES</h1>
+            <p class="subtitle" data-i18n="site.subtitle">Elige tu tipo de ruleta favorita</p>
+            <div class="stats-banner">
+                <div class="stat-item">
+                    <i class="fas fa-eye"></i>
+                    <span data-i18n="stats.visits">Visitas:</span>
+                    <span id="visit-counter">0</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-gamepad"></i>
+                    <span data-i18n="stats.games">Juegos:</span>
+                    <span>6</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span data-i18n="stats.online">En línea:</span>
+                    <span id="online-counter">1</span>
+                </div>
+            </div>
+        </div>
         
         <div class="menu-grid">
-            <div class="menu-card" onclick="navigateTo('ruleta.html')">
+            <div class="menu-card featured" onclick="navigateTo('ruleta.html')">
                 <div class="card-icon">
-                    <img src="multimedia/favicon.ico" alt="Ruleta" style="width: 48px; height: 48px;">
+                    <i class="fas fa-star"></i>
                 </div>
+                <div class="card-badge">POPULAR</div>
                 <h3 data-i18n="roulette.title">Ruleta de Doble Vega</h3>
                 <p data-i18n="roulette.description">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
                 <div class="card-button" data-i18n="button.play">Jugar</div>
             </div>
+
+            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+                <div class="card-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h3 data-i18n="roulette.custom.title">Ruleta Personalizada</h3>
+                <p data-i18n="roulette.custom.description">Esta opción está en desarrollo</p>
+                <div class="card-button" data-i18n="button.play">En desarrollo</div>
+            </div>
+
+            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+                <div class="card-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3 data-i18n="roulette.food.title">Ruleta de Comida</h3>
+                <p data-i18n="roulette.food.description">Esta opción está en desarrollo</p>
+                <div class="card-button" data-i18n="button.play">En desarrollo</div>
+            </div>
+
+            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+                <div class="card-icon">
+                    <i class="fas fa-running"></i>
+                </div>
+                <h3 data-i18n="roulette.activities.title">Ruleta de Actividades</h3>
+                <p data-i18n="roulette.activities.description">Esta opción está en desarrollo</p>
+                <div class="card-button" data-i18n="button.play">En desarrollo</div>
+            </div>
+
+            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+                <div class="card-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                <h3 data-i18n="roulette.decisions.title">Ruleta de Decisiones</h3>
+                <p data-i18n="roulette.decisions.description">Esta opción está en desarrollo</p>
+                <div class="card-button" data-i18n="button.play">En desarrollo</div>
+            </div>
+
+            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+                <div class="card-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 data-i18n="roulette.colors.title">Ruleta de Colores</h3>
+                <p data-i18n="roulette.colors.description">Esta opción está en desarrollo</p>
+                <div class="card-button" data-i18n="button.play">En desarrollo</div>
+            </div>
         </div>
 
-        <div class="footer">
-            <p data-i18n="footer.made_by">Hecho por Alejandro Fernández García</p>
-        </div>
+        <!-- Footer mejorado -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4 data-i18n="footer.about.title">Acerca de PSK Games</h4>
+                    <p data-i18n="footer.about.description">La mejor colección de ruletas interactivas para tomar decisiones de forma divertida.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" title="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 data-i18n="footer.games.title">Juegos Disponibles</h4>
+                    <ul>
+                        <li><a href="ruleta.html" data-i18n="roulette.title">Ruleta de Doble Vega</a></li>
+                        <li><a href="#" data-i18n="roulette.custom.title">Ruleta Personalizada</a></li>
+                        <li><a href="#" data-i18n="roulette.food.title">Ruleta de Comida</a></li>
+                        <li><a href="#" data-i18n="roulette.activities.title">Ruleta de Actividades</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 data-i18n="footer.stats.title">Estadísticas</h4>
+                    <div class="footer-stats">
+                        <div class="stat">
+                            <i class="fas fa-play-circle"></i>
+                            <span data-i18n="footer.stats.games_played">Partidas jugadas:</span>
+                            <span id="games-played">1,234</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-users"></i>
+                            <span data-i18n="footer.stats.total_users">Usuarios totales:</span>
+                            <span id="total-users">567</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-heart"></i>
+                            <span data-i18n="footer.stats.favorites">Favoritos:</span>
+                            <span id="favorites">89</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p data-i18n="footer.made_by">Hecho por Alejandro Fernández García</p>
+                <p data-i18n="footer.version">Versión 2.0 - Actualizado el 27/06/2025</p>
+                <div class="footer-links">
+                    <a href="#" data-i18n="footer.privacy">Privacidad</a>
+                    <a href="#" data-i18n="footer.terms">Términos</a>
+                    <a href="#" data-i18n="footer.contact">Contacto</a>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script src="js/menu.js"></script>

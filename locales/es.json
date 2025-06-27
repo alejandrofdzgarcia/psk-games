@@ -23,5 +23,11 @@
     
     "language.selector": "Idioma",
     "language.spanish": "Español",
-    "language.english": "English"
+    "language.english": "English",
+    
+    "roulette.custom.description": "Esta opción está en desarrollo",
+    "roulette.food.description": "Esta opción está en desarrollo",
+    "roulette.activities.description": "Esta opción está en desarrollo",
+    "roulette.decisions.description": "Esta opción está en desarrollo",
+    "roulette.colors.description": "Esta opción está en desarrollo"
 }
