@@ -1,18 +1,14 @@
 class Ruleta {
     constructor() {
+        // Ruleta de casino con orden tradicional (sin 00 para versión europea)
         this.opciones = [
-            "Opción 1",
-            "Opción 2", 
-            "Opción 3",
-            "Opción 4",
-            "Opción 5",
-            "Opción 6"
+            "0", "32", "15", "19", "4", "21", "2", "25", "17", "34", "6", "27",
+            "13", "36", "11", "30", "8", "23", "10", "5", "24", "16", "33", "1",
+            "20", "14", "31", "9", "22", "18", "29", "7", "28", "12", "35", "3", "26"
         ];
-        this.colores = [
-            '#DC143C', '#228B22', '#1E90FF', '#FF8C00', '#9370DB', '#FF1493', 
-            '#00CED1', '#32CD32', '#FFD700', '#FF6347', '#8A2BE2', '#00FF7F',
-            '#FF69B4', '#4169E1', '#FFA500', '#8B008B', '#00FA9A', '#FF4500'
-        ];
+        
+        // Colores según el orden tradicional de casino
+        this.colores = this.generarColoresCasino();
         this.girando = false;
         this.rotacionActual = 0;
         this.canvas = null;
@@ -28,7 +24,24 @@ class Ruleta {
         this.initCanvas();
         this.initEventListeners();
         this.dibujarRuleta();
-        this.mostrarOpciones();
+    }
+
+    generarColoresCasino() {
+        const colores = [];
+        // Números rojos en una ruleta americana: 1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
+        const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        
+        this.opciones.forEach((opcion) => {
+            if (opcion === "0" || opcion === "00") {
+                colores.push('#00AA00'); // Verde para 0 y 00
+            } else if (numerosRojos.includes(parseInt(opcion))) {
+                colores.push('#DC143C'); // Rojo
+            } else {
+                colores.push('#1A1A1A'); // Negro
+            }
+        });
+        
+        return colores;
     }
 
     initAudio() {
@@ -70,26 +83,13 @@ class Ruleta {
     }
 
     initEventListeners() {
-        // Botón de girar
+        // Solo botones de girar y reiniciar
         document.getElementById('spinButton').addEventListener('click', () => {
             this.girarRuleta();
         });
 
-        // Botón de reiniciar
         document.getElementById('resetButton').addEventListener('click', () => {
             this.reiniciarRuleta();
-        });
-
-        // Botón de agregar opción
-        document.getElementById('addOption').addEventListener('click', () => {
-            this.agregarOpcion();
-        });
-
-        // Enter en el input para agregar opción
-        document.getElementById('newOption').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.agregarOpcion();
-            }
         });
     }
 
@@ -166,7 +166,7 @@ class Ruleta {
 
         // Configurar el texto
         this.ctx.fillStyle = 'white';
-        this.ctx.font = `bold ${texto.length > 10 ? '12' : '14'}px Arial`;
+        this.ctx.font = `bold ${texto.length > 2 ? '10' : '14'}px Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
@@ -224,7 +224,7 @@ class Ruleta {
         this.ctx.font = '18px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Agrega opciones para comenzar', this.centerX, this.centerY);
+        this.ctx.fillText('Ruleta de Casino Lista', this.centerX, this.centerY);
     }
 
     gradosARadianes(grados) {
@@ -306,9 +306,25 @@ class Ruleta {
         const indiceGanador = Math.floor(anguloNormalizado / anguloPorSegmento);
         const ganador = this.opciones[indiceGanador];
 
-        // Mostrar resultado
+        // Mostrar resultado con color apropiado
         const result = document.getElementById('result');
-        result.textContent = `🎉 ¡${ganador}! 🎉`;
+        let mensajeColor = '#FFD700'; // Dorado por defecto
+        
+        if (ganador === "0" || ganador === "00") {
+            mensajeColor = '#00AA00'; // Verde
+            result.textContent = `🎉 ¡${ganador} - VERDE! 🎉`;
+        } else {
+            const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+            if (numerosRojos.includes(parseInt(ganador))) {
+                mensajeColor = '#DC143C'; // Rojo
+                result.textContent = `🎉 ¡${ganador} - ROJO! 🎉`;
+            } else {
+                mensajeColor = '#1A1A1A'; // Negro
+                result.textContent = `🎉 ¡${ganador} - NEGRO! 🎉`;
+            }
+        }
+        
+        result.style.color = mensajeColor;
         result.classList.add('winner-animation');
 
         // Efectos adicionales
@@ -322,53 +338,6 @@ class Ruleta {
         spinButton.textContent = '¡GIRAR RULETA!';
     }
 
-    agregarOpcion() {
-        const input = document.getElementById('newOption');
-        const nuevaOpcion = input.value.trim();
-
-        if (nuevaOpcion && !this.opciones.includes(nuevaOpcion)) {
-            this.opciones.push(nuevaOpcion);
-            input.value = '';
-            this.dibujarRuleta();
-            this.mostrarOpciones();
-        } else if (this.opciones.includes(nuevaOpcion)) {
-            alert('Esta opción ya existe');
-        }
-    }
-
-    eliminarOpcion(index) {
-        if (this.opciones.length > 1) {
-            this.opciones.splice(index, 1);
-            this.dibujarRuleta();
-            this.mostrarOpciones();
-        }
-    }
-
-    mostrarOpciones() {
-        const lista = document.getElementById('optionsList');
-        lista.innerHTML = '';
-
-        this.opciones.forEach((opcion, index) => {
-            const tag = document.createElement('div');
-            tag.className = 'option-tag';
-            
-            const texto = document.createElement('span');
-            texto.textContent = opcion;
-            
-            const botonEliminar = document.createElement('button');
-            botonEliminar.className = 'remove-option';
-            botonEliminar.innerHTML = '×';
-            botonEliminar.onclick = () => this.eliminarOpcion(index);
-            
-            tag.appendChild(texto);
-            if (this.opciones.length > 1) {
-                tag.appendChild(botonEliminar);
-            }
-            
-            lista.appendChild(tag);
-        });
-    }
-
     reiniciarRuleta() {
         if (this.girando) return;
 
@@ -377,22 +346,8 @@ class Ruleta {
         
         const result = document.getElementById('result');
         result.textContent = '';
+        result.style.color = '';
         result.classList.remove('winner-animation');
-
-        // Opcional: Resetear a opciones por defecto
-        const confirmar = confirm('¿Quieres resetear también las opciones a las predeterminadas?');
-        if (confirmar) {
-            this.opciones = [
-                "Opción 1",
-                "Opción 2", 
-                "Opción 3",
-                "Opción 4",
-                "Opción 5",
-                "Opción 6"
-            ];
-            this.dibujarRuleta();
-            this.mostrarOpciones();
-        }
     }
 
     crearConfetti() {
@@ -436,13 +391,11 @@ class Ruleta {
         }
     }
 
-    // Método para agregar múltiples opciones desde código
-    configurarOpciones(nuevasOpciones) {
-        if (Array.isArray(nuevasOpciones) && nuevasOpciones.length > 0) {
-            this.opciones = nuevasOpciones;
-            this.dibujarRuleta();
-            this.mostrarOpciones();
-        }
+    // Método para obtener el color de un número
+    obtenerColorNumero(numero) {
+        if (numero === "0" || numero === "00") return "Verde";
+        const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        return numerosRojos.includes(parseInt(numero)) ? "Rojo" : "Negro";
     }
 
     // Método para obtener todas las opciones
@@ -456,6 +409,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.ruleta = new Ruleta();
 });
 
-// Ejemplos de uso que puedes llamar desde la consola del navegador:
-// ruleta.configurarOpciones(['Pizza', 'Hamburguesa', 'Tacos', 'Sushi', 'Pasta']);
-// ruleta.obtenerOpciones();
+// La ruleta ahora es una ruleta de casino fija con números del 0, 00, 1-36
+// Los colores siguen el estándar de casino: Verde (0, 00), Rojo y Negro (números)
