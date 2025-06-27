@@ -33,9 +33,22 @@ function navigateTo(page) {
     }, 300);
 }
 
-// JavaScript para el menú principal mejorado
+if (!window.apiClient) {
+    // Fallback si no se carga el API client
+    window.apiClient = {
+        recordVisit: () => Promise.resolve({}),
+        getStats: () => Promise.resolve({
+            totalVisits: parseInt(localStorage.getItem('psk_visit_count') || '1234'),
+            totalGamesPlayed: parseInt(localStorage.getItem('psk_games_played') || '5678'),
+            activeUsers: Math.floor(Math.random() * 5) + 1
+        }),
+        updateActivity: () => Promise.resolve({})
+    };
+}
+
 class MenuPrincipal {
     constructor() {
+        this.initApiClient();
         this.visitCount = this.getVisitCount();
         this.updateVisitCounter();
         this.initEventListeners();
@@ -43,6 +56,37 @@ class MenuPrincipal {
         this.createFloatingParticles();
         this.initTheme();
         this.simulateOnlineUsers();
+        this.loadStatsFromAPI();
+    }
+
+    async initApiClient() {
+        // Registrar visita en la API
+        try {
+            await window.apiClient.recordVisit();
+            await window.apiClient.updateActivity('home');
+        } catch (error) {
+            console.log('API no disponible, usando datos locales');
+        }
+    }
+
+    async loadStatsFromAPI() {
+        try {
+            const stats = await window.apiClient.getStats();
+            
+            // Actualizar contadores con datos de la API
+            document.getElementById('visit-counter').textContent = stats.totalVisits.toLocaleString();
+            
+            // Actualizar usuarios online
+            document.getElementById('online-counter').textContent = stats.activeUsers;
+            
+            // Actualizar juegos jugados si existe el elemento
+            const gamesElement = document.querySelector('[data-stat="games"]');
+            if (gamesElement) {
+                gamesElement.textContent = stats.totalGamesPlayed.toLocaleString();
+            }
+        } catch (error) {
+            console.log('Usando estadísticas locales');
+        }
     }
 
     // Contador de visitas

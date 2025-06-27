@@ -361,12 +361,53 @@ class Ruleta {
         this.crearConfetti();
         console.log(`🎉 ¡GANADOR: ${ganador}! 🎉`);
 
+        // Guardar resultado en la API
+        this.guardarResultado(ganador, this.colores[indiceGanador]);
+
         // Resetear botón
         this.girando = false;
         const spinButton = document.getElementById('spinButton');
         spinButton.disabled = false;
         const spinText = window.i18n ? window.i18n.t('roulette.spin') : '¡GIRAR RULETA!';
         spinButton.textContent = spinText;
+    }
+
+    // Método para guardar el resultado del giro en la API
+    async guardarResultado(numero, color) {
+        try {
+            const colorName = this.getColorName(color);
+            const startTime = Date.now();
+            
+            await window.apiClient.recordGameResult('roulette', {
+                number: numero,
+                color: colorName,
+                colorHex: color,
+                option: `${numero} - ${colorName}`
+            });
+            
+            console.log(`✅ Resultado guardado: ${numero} - ${colorName}`);
+        } catch (error) {
+            console.log('⚠️ No se pudo guardar el resultado en la API:', error.message);
+        }
+    }
+
+    // Método para obtener el nombre del color
+    getColorName(hexColor) {
+        if (window.apiClient && typeof window.apiClient.getColorName === 'function') {
+            return window.apiClient.getColorName(hexColor);
+        }
+        
+        // Fallback local
+        switch (hexColor) {
+            case '#00AA00':
+                return 'VERDE';
+            case '#DC143C':
+                return 'ROJO';
+            case '#1A1A1A':
+                return 'NEGRO';
+            default:
+                return 'DESCONOCIDO';
+        }
     }
 
     crearConfetti() {
@@ -434,6 +475,11 @@ class Ruleta {
 
 // Inicializar la ruleta cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
+    // Esperar a que la API esté disponible
+    if (window.apiClient) {
+        window.apiClient.updateActivity('roulette');
+    }
+    
     window.ruleta = new Ruleta();
 });
 
