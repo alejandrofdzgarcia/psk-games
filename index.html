@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <title data-i18n="site.title">PSK - Games</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruleta Interactiva</title>
     <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
     <link rel="stylesheet" href="estilos/styles.css">
+    <script src="js/i18n.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Ruleta de la Suerte</h1>
-        <p class="subtitle">Elige tu tipo de ruleta favorita</p>
+        <h1 data-i18n="site.title">PSK - GAMES</h1>
+        <p class="subtitle" data-i18n="site.subtitle">Elige tu tipo de ruleta favorita</p>
         
         <div class="menu-grid">
             <div class="menu-card" onclick="navigateTo('ruleta.html')">
                 <div class="card-icon">
                     <img src="multimedia/favicon.ico" alt="Ruleta" style="width: 48px; height: 48px;">
                 </div>
-                <h3>Ruleta de Doble Vega</h3>
-                <p>Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
-                <div class="card-button">Jugar</div>
+                <h3 data-i18n="roulette.title">Ruleta de Doble Vega</h3>
+                <p data-i18n="roulette.description">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
+                <div class="card-button" data-i18n="button.play">Jugar</div>
             </div>
         </div>
 
         <div class="footer">
-            <p>Hecho por Alejandro Fernández García</p>
+            <p data-i18n="footer.made_by">Hecho por Alejandro Fernández García</p>
         </div>
     </div>
 

@@ -1,0 +1,27 @@
+{
+    "site.title": "PSK - Games",
+    "site.subtitle": "Elige tu tipo de ruleta favorita",
+    "nav.home": "Inicio",
+    "nav.back": "← Volver al Menú",
+    "footer.made_by": "Hecho por Alejandro Fernández García",
+    
+    "roulette.title": "Ruleta de Doble Vega",
+    "roulette.description": "Esta ruleta solo es apta para ludópatas (véase Vega Vega)",
+    "button.play": "Jugar",
+    
+    "roulette.page_title": "Ruleta Personalizada - Ruleta de la Suerte",
+    "roulette.spin": "¡GIRAR RULETA!",
+    "roulette.spinning": "Girando...",
+    "roulette.winner_green": "🎉 ¡%s - VERDE! 🎉",
+    "roulette.winner_red": "🎉 ¡%s - ROJO! 🎉",
+    "roulette.winner_black": "🎉 ¡%s - NEGRO! 🎉",
+    "roulette.ready": "Ruleta de Casino Lista",
+    
+    "color.green": "Verde",
+    "color.red": "Rojo",
+    "color.black": "Negro",
+    
+    "language.selector": "Idioma",
+    "language.spanish": "Español",
+    "language.english": "English"
+}

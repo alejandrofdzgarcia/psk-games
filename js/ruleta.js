@@ -248,7 +248,8 @@ class Ruleta {
         this.ctx.font = '18px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('Ruleta de Casino Lista', this.centerX, this.centerY);
+        const mensaje = window.i18n ? window.i18n.t('roulette.ready') : 'Ruleta de Casino Lista';
+        this.ctx.fillText(mensaje, this.centerX, this.centerY);
     }
 
     gradosARadianes(grados) {
@@ -268,7 +269,8 @@ class Ruleta {
         const result = document.getElementById('result');
         
         spinButton.disabled = true;
-        spinButton.textContent = 'Girando...';
+        const spinningText = window.i18n ? window.i18n.t('roulette.spinning') : 'Girando...';
+        spinButton.textContent = spinningText;
         result.textContent = '';
         result.classList.remove('winner-animation');
 
@@ -336,16 +338,19 @@ class Ruleta {
         
         if (ganador === "0") {
             mensajeColor = '#00AA00'; // Verde
-            result.textContent = `🎉 ¡${ganador} - VERDE! 🎉`;
+            const greenText = window.i18n ? window.i18n.t('roulette.winner_green', ganador) : `🎉 ¡${ganador} - VERDE! 🎉`;
+            result.textContent = greenText;
         } else {
             // Obtener el color basado en la posición del número ganador
             const colorGanador = this.colores[indiceGanador];
             if (colorGanador === '#DC143C') {
                 mensajeColor = '#DC143C'; // Rojo
-                result.textContent = `🎉 ¡${ganador} - ROJO! 🎉`;
+                const redText = window.i18n ? window.i18n.t('roulette.winner_red', ganador) : `🎉 ¡${ganador} - ROJO! 🎉`;
+                result.textContent = redText;
             } else {
                 mensajeColor = '#1A1A1A'; // Negro
-                result.textContent = `🎉 ¡${ganador} - NEGRO! 🎉`;
+                const blackText = window.i18n ? window.i18n.t('roulette.winner_black', ganador) : `🎉 ¡${ganador} - NEGRO! 🎉`;
+                result.textContent = blackText;
             }
         }
         
@@ -360,7 +365,8 @@ class Ruleta {
         this.girando = false;
         const spinButton = document.getElementById('spinButton');
         spinButton.disabled = false;
-        spinButton.textContent = '¡GIRAR RULETA!';
+        const spinText = window.i18n ? window.i18n.t('roulette.spin') : '¡GIRAR RULETA!';
+        spinButton.textContent = spinText;
     }
 
     crearConfetti() {
@@ -410,8 +416,14 @@ class Ruleta {
         if (indice === -1) return "No encontrado";
         
         const color = this.colores[indice];
-        if (numero === "0") return "Verde";
-        return color === '#DC143C' ? "Rojo" : "Negro";
+        if (numero === "0") {
+            return window.i18n ? window.i18n.t('color.green') : "Verde";
+        }
+        if (color === '#DC143C') {
+            return window.i18n ? window.i18n.t('color.red') : "Rojo";
+        } else {
+            return window.i18n ? window.i18n.t('color.black') : "Negro";
+        }
     }
 
     // Método para obtener todas las opciones

@@ -1,0 +1,27 @@
+{
+    "site.title": "PSK - Games",
+    "site.subtitle": "Choose your favorite roulette type",
+    "nav.home": "Home",
+    "nav.back": "← Back to Menu",
+    "footer.made_by": "Made by Alejandro Fernández García",
+    
+    "roulette.title": "Double Vega Roulette",
+    "roulette.description": "This roulette is only suitable for gambling addicts (see Vega Vega)",
+    "button.play": "Play",
+    
+    "roulette.page_title": "Custom Roulette - Lucky Wheel",
+    "roulette.spin": "SPIN ROULETTE!",
+    "roulette.spinning": "Spinning...",
+    "roulette.winner_green": "🎉 %s - GREEN! 🎉",
+    "roulette.winner_red": "🎉 %s - RED! 🎉",
+    "roulette.winner_black": "🎉 %s - BLACK! 🎉",
+    "roulette.ready": "Casino Roulette Ready",
+    
+    "color.green": "Green",
+    "color.red": "Red",
+    "color.black": "Black",
+    
+    "language.selector": "Language",
+    "language.spanish": "Español",
+    "language.english": "English"
+}

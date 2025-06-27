@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <title data-i18n="roulette.page_title">Ruleta Personalizada - Ruleta de la Suerte</title>
+    <link rel="stylesheet" href="estilos/ruleta-styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruleta Personalizada - Ruleta de la Suerte</title>
     <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
     <link rel="stylesheet" href="estilos/styles.css">
-    <link rel="stylesheet" href="estilos/ruleta-styles.css">
+    <script src="js/i18n.js"></script>
 </head>
 <body>
     <div class="navigation">
-        <button class="back-button" onclick="volverAlMenu()">← Volver al Menú</button>
+        <button class="back-button" onclick="volverAlMenu()" data-i18n="nav.back">← Volver al Menú</button>
     </div>
 
     <div class="container">
-        <h1>🎲 Ruleta Personalizada</h1>
-        <p class="subtitle">Crea tu propia ruleta con las opciones que quieras</p>
+        <h1 data-i18n="roulette.title">🎲 Ruleta de Doble Vega</h1>
+        <p class="subtitle" data-i18n="roulette.description">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
         
         <div class="wheel-container">
             <div class="wheel-pointer"></div>
@@ -25,7 +26,7 @@
         </div>
 
         <div class="controls">
-            <button class="spin-button" id="spinButton">¡GIRAR RULETA!</button>
+            <button class="spin-button" id="spinButton" data-i18n="roulette.spin">¡GIRAR RULETA!</button>
         </div>
 
         <div class="result" id="result"></div>
