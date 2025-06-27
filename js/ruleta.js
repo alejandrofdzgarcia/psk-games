@@ -9,9 +9,9 @@ class Ruleta {
             "Opción 6"
         ];
         this.colores = [
-            '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', 
-            '#ffeaa7', '#dda0dd', '#98d8c8', '#f7dc6f',
-            '#bb8fce', '#85c1e9', '#f8c471', '#82e0aa'
+            '#DC143C', '#228B22', '#DC143C', '#000000', '#DC143C', '#228B22', 
+            '#DC143C', '#000000', '#DC143C', '#228B22', '#DC143C', '#000000',
+            '#DC143C', '#228B22', '#DC143C', '#000000', '#DC143C', '#228B22'
         ];
         this.girando = false;
         this.rotacionActual = 0;
@@ -60,18 +60,46 @@ class Ruleta {
             const seccion = document.createElement('div');
             seccion.className = 'wheel-section';
             seccion.style.backgroundColor = this.colores[index % this.colores.length];
-            seccion.style.transform = `rotate(${index * anguloPorSeccion}deg)`;
-            seccion.textContent = opcion;
-
-            // Ajustar el tamaño del texto según la longitud
-            if (opcion.length > 10) {
-                seccion.style.fontSize = '12px';
-            } else if (opcion.length > 15) {
-                seccion.style.fontSize = '10px';
-            }
+            
+            // Crear una sección triangular que apunte al centro
+            const anguloInicio = index * anguloPorSeccion;
+            const anguloFin = (index + 1) * anguloPorSeccion;
+            
+            // Posicionar la sección usando clip-path para crear forma triangular
+            seccion.style.clipPath = `polygon(50% 50%, 
+                ${50 + 50 * Math.cos((anguloInicio - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((anguloInicio - 90) * Math.PI / 180)}%, 
+                ${50 + 50 * Math.cos((anguloFin - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((anguloFin - 90) * Math.PI / 180)}%)`;
+            
+            // Crear el texto de la opción
+            const texto = document.createElement('div');
+            texto.className = 'wheel-text';
+            texto.textContent = opcion;
+            
+            // Posicionar el texto en el centro de la sección
+            const anguloMedio = (anguloInicio + anguloFin) / 2;
+            const radioTexto = 60; // Distancia del centro donde aparece el texto
+            const x = 50 + radioTexto * Math.cos((anguloMedio - 90) * Math.PI / 180);
+            const y = 50 + radioTexto * Math.sin((anguloMedio - 90) * Math.PI / 180);
+            
+            texto.style.position = 'absolute';
+            texto.style.left = x + '%';
+            texto.style.top = y + '%';
+            texto.style.transform = 'translate(-50%, -50%)';
+            texto.style.color = 'white';
+            texto.style.fontWeight = 'bold';
+            texto.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
+            texto.style.fontSize = opcion.length > 10 ? '12px' : '14px';
+            texto.style.pointerEvents = 'none';
+            texto.style.zIndex = '2';
 
             wheel.appendChild(seccion);
+            wheel.appendChild(texto);
         });
+
+        // Agregar el centro de la ruleta
+        const centro = document.createElement('div');
+        centro.className = 'wheel-center';
+        wheel.appendChild(centro);
     }
 
     girarRuleta() {
@@ -99,7 +127,8 @@ class Ruleta {
 
         // Calcular el ganador
         setTimeout(() => {
-            const anguloNormalizado = (360 - (this.rotacionActual % 360)) % 360;
+            // El puntero está en la parte superior (270 grados), ajustamos el cálculo
+            const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
             const anguloPorSeccion = 360 / this.opciones.length;
             const indiceGanador = Math.floor(anguloNormalizado / anguloPorSeccion);
             const ganador = this.opciones[indiceGanador];
