@@ -28,20 +28,48 @@ class Ruleta {
 
     generarColoresCasino() {
         const colores = [];
-        // Números rojos en una ruleta americana: 1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
-        const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        // Colores según el orden exacto proporcionado por el usuario
+        const coloresPorPosicion = [
+            '#00AA00', // 0 - Verde
+            '#DC143C', // 32 - Rojo
+            '#1A1A1A', // 15 - Negro
+            '#DC143C', // 19 - Rojo
+            '#1A1A1A', // 4 - Negro
+            '#DC143C', // 21 - Rojo
+            '#1A1A1A', // 2 - Negro
+            '#DC143C', // 25 - Rojo
+            '#1A1A1A', // 17 - Negro
+            '#DC143C', // 34 - Rojo
+            '#1A1A1A', // 6 - Negro
+            '#DC143C', // 27 - Rojo
+            '#1A1A1A', // 13 - Negro
+            '#DC143C', // 36 - Rojo
+            '#1A1A1A', // 11 - Negro
+            '#DC143C', // 30 - Rojo
+            '#1A1A1A', // 8 - Negro
+            '#DC143C', // 23 - Rojo
+            '#1A1A1A', // 10 - Negro
+            '#DC143C', // 5 - Rojo
+            '#1A1A1A', // 24 - Negro
+            '#DC143C', // 16 - Rojo
+            '#1A1A1A', // 33 - Negro
+            '#DC143C', // 1 - Rojo
+            '#1A1A1A', // 20 - Negro
+            '#DC143C', // 14 - Rojo
+            '#1A1A1A', // 31 - Negro
+            '#DC143C', // 9 - Rojo
+            '#1A1A1A', // 22 - Negro
+            '#DC143C', // 18 - Rojo
+            '#1A1A1A', // 29 - Negro
+            '#DC143C', // 7 - Rojo
+            '#1A1A1A', // 28 - Negro
+            '#DC143C', // 12 - Rojo
+            '#1A1A1A', // 35 - Negro
+            '#DC143C', // 3 - Rojo
+            '#1A1A1A'  // 26 - Negro
+        ];
         
-        this.opciones.forEach((opcion) => {
-            if (opcion === "0" || opcion === "00") {
-                colores.push('#00AA00'); // Verde para 0 y 00
-            } else if (numerosRojos.includes(parseInt(opcion))) {
-                colores.push('#DC143C'); // Rojo
-            } else {
-                colores.push('#1A1A1A'); // Negro
-            }
-        });
-        
-        return colores;
+        return coloresPorPosicion;
     }
 
     initAudio() {
@@ -310,12 +338,13 @@ class Ruleta {
         const result = document.getElementById('result');
         let mensajeColor = '#FFD700'; // Dorado por defecto
         
-        if (ganador === "0" || ganador === "00") {
+        if (ganador === "0") {
             mensajeColor = '#00AA00'; // Verde
             result.textContent = `🎉 ¡${ganador} - VERDE! 🎉`;
         } else {
-            const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-            if (numerosRojos.includes(parseInt(ganador))) {
+            // Obtener el color basado en la posición del número ganador
+            const colorGanador = this.colores[indiceGanador];
+            if (colorGanador === '#DC143C') {
                 mensajeColor = '#DC143C'; // Rojo
                 result.textContent = `🎉 ¡${ganador} - ROJO! 🎉`;
             } else {
@@ -393,9 +422,12 @@ class Ruleta {
 
     // Método para obtener el color de un número
     obtenerColorNumero(numero) {
-        if (numero === "0" || numero === "00") return "Verde";
-        const numerosRojos = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-        return numerosRojos.includes(parseInt(numero)) ? "Rojo" : "Negro";
+        const indice = this.opciones.indexOf(numero.toString());
+        if (indice === -1) return "No encontrado";
+        
+        const color = this.colores[indice];
+        if (numero === "0") return "Verde";
+        return color === '#DC143C' ? "Rojo" : "Negro";
     }
 
     // Método para obtener todas las opciones
@@ -409,5 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.ruleta = new Ruleta();
 });
 
-// La ruleta ahora es una ruleta de casino fija con números del 0, 00, 1-36
-// Los colores siguen el estándar de casino: Verde (0, 00), Rojo y Negro (números)
+// La ruleta ahora sigue el orden tradicional de casino europeo:
+// 0(Verde), 32(Rojo), 15(Negro), 19(Rojo), 4(Negro), 21(Rojo), 2(Negro), 25(Rojo), 17(Negro), 34(Rojo), 6(Negro), 27(Rojo),
+// 13(Negro), 36(Rojo), 11(Negro), 30(Rojo), 8(Negro), 23(Rojo), 10(Negro), 5(Rojo), 24(Negro), 16(Rojo), 33(Negro), 1(Rojo),
+// 20(Negro), 14(Rojo), 31(Negro), 9(Rojo), 22(Negro), 18(Rojo), 29(Negro), 7(Rojo), 28(Negro), 12(Rojo), 35(Negro), 3(Rojo), 26(Negro)
