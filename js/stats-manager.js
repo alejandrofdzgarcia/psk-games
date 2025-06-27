@@ -60,7 +60,16 @@ class StatsManager {
         
         this.updateInterval = setInterval(async () => {
             try {
-                // Actualizar usuarios activos
+                // Actualizar contador de visitas
+                const visitasData = await window.apiClient.getVisitas();
+                if (visitasData && visitasData.visitas) {
+                    const visitElement = document.getElementById('visit-counter');
+                    if (visitElement) {
+                        visitElement.textContent = visitasData.visitas.toLocaleString();
+                    }
+                }
+
+                // Actualizar usuarios activos y otras estadísticas
                 const activeData = await window.apiClient.getActiveUsers();
                 if (activeData && activeData.activeUsers) {
                     const onlineElement = document.getElementById('online-counter');
@@ -71,10 +80,10 @@ class StatsManager {
 
                 // Actualizar estadísticas generales
                 const stats = await window.apiClient.getStats();
-                if (stats) {
-                    const visitElement = document.getElementById('visit-counter');
-                    if (visitElement && stats.totalVisits) {
-                        visitElement.textContent = stats.totalVisits.toLocaleString();
+                if (stats && stats.totalGamesPlayed) {
+                    const gamesElement = document.querySelector('[data-stat="games"]');
+                    if (gamesElement) {
+                        gamesElement.textContent = stats.totalGamesPlayed.toLocaleString();
                     }
                 }
             } catch (error) {
@@ -98,10 +107,13 @@ class StatsManager {
         }
 
         try {
+            // Obtener visitas del endpoint específico
+            const visitasData = await window.apiClient.getVisitas();
+            
             const [stats, userStats, popularNumbers] = await Promise.all([
-                window.apiClient.getStats(),
-                window.apiClient.getUserStats(),
-                window.apiClient.getPopularNumbers()
+                window.apiClient.getStats().catch(() => null),
+                window.apiClient.getUserStats().catch(() => null),
+                window.apiClient.getPopularNumbers().catch(() => null)
             ]);
 
             const panel = document.createElement('div');
@@ -129,9 +141,9 @@ class StatsManager {
                 
                 <div style="margin-bottom: 15px;">
                     <h4 style="margin: 5px 0; color: #FFD700;">🌍 Globales</h4>
-                    <p>Visitas totales: ${stats.totalVisits?.toLocaleString() || 'N/A'}</p>
-                    <p>Juegos jugados: ${stats.totalGamesPlayed?.toLocaleString() || 'N/A'}</p>
-                    <p>Usuarios activos: ${stats.activeUsers || 'N/A'}</p>
+                    <p>Visitas totales: ${visitasData?.visitas?.toLocaleString() || stats?.totalVisits?.toLocaleString() || 'N/A'}</p>
+                    <p>Juegos jugados: ${stats?.totalGamesPlayed?.toLocaleString() || 'N/A'}</p>
+                    <p>Usuarios activos: ${stats?.activeUsers || 'N/A'}</p>
                 </div>
 
                 ${userStats ? `

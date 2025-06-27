@@ -4,8 +4,19 @@ Este proyecto ahora está integrado con una API de MongoDB Atlas desplegada en R
 
 ## URL de la API
 ```
-https://psk-games-api.onrender.com/api
+https://psk-games-api.onrender.com
 ```
+
+## Endpoints Principales
+
+### 📊 Contador de Visitas
+- **GET** `/api/visitas` - Obtener el contador actual de visitas
+- **POST** `/api/visitas/incrementar` - Incrementar el contador de visitas
+
+### 📈 Otros Endpoints (si están disponibles)
+- **GET** `/api/stats` - Estadísticas generales
+- **POST** `/api/games/result` - Registrar resultado de juego
+- **GET** `/api/games/roulette/popular-numbers` - Números más populares
 
 ## Funcionalidades Implementadas
 
@@ -65,8 +76,10 @@ window.showStats();
 window.showPopularNumbers();
 
 // Acceso a la API
-window.apiClient.getStats();
-window.apiClient.recordGameResult('roulette', result);
+window.apiClient.getVisitas();           // Obtener contador de visitas
+window.apiClient.incrementarVisita();    // Incrementar contador
+window.apiClient.getStats();             // Estadísticas generales
+window.apiClient.recordGameResult('roulette', result);  // Registrar juego
 ```
 
 ## Estructura de la Base de Datos
@@ -114,7 +127,7 @@ La API está configurada para aceptar requests desde:
 ## Troubleshooting
 
 ### La API no responde
-- Verificar que `https://psk-games-api.onrender.com/api/health` responda
+- Verificar que `https://psk-games-api.onrender.com/api/visitas` responda
 - Revisar la consola del navegador por errores CORS
 - La aplicación seguirá funcionando en modo offline
 
@@ -122,3 +135,12 @@ La API está configurada para aceptar requests desde:
 - Verificar conexión a internet
 - Comprobar que localStorage esté habilitado
 - Presionar Ctrl + S para ver estadísticas detalladas
+
+### Probar la API manualmente
+```bash
+# Obtener visitas
+curl https://psk-games-api.onrender.com/api/visitas
+
+# Incrementar visita
+curl -X POST https://psk-games-api.onrender.com/api/visitas/incrementar
+```

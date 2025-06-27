@@ -1,7 +1,7 @@
 // Cliente para conectar con la API
 class ApiClient {
     constructor() {
-        this.baseURL = 'https://psk-games-api.onrender.com/api';
+        this.baseURL = 'https://psk-games-api.onrender.com';
         this.sessionId = this.generateSessionId();
         this.initialized = false;
     }
@@ -42,6 +42,20 @@ class ApiClient {
 
     getFallbackData(endpoint) {
         // Datos por defecto cuando la API no está disponible
+        if (endpoint.includes('/api/visitas') && !endpoint.includes('/incrementar')) {
+            return {
+                visitas: parseInt(localStorage.getItem('psk_visit_count') || '1234')
+            };
+        }
+        if (endpoint.includes('/api/visitas/incrementar')) {
+            const currentCount = parseInt(localStorage.getItem('psk_visit_count') || '1234');
+            const newCount = currentCount + 1;
+            localStorage.setItem('psk_visit_count', newCount);
+            return {
+                success: true,
+                visitas: newCount
+            };
+        }
         if (endpoint.includes('/stats') && !endpoint.includes('/visit')) {
             return {
                 totalVisits: parseInt(localStorage.getItem('psk_visit_count') || '1234'),
@@ -71,12 +85,39 @@ class ApiClient {
     }
 
     // Métodos de la API
+    
+    // Métodos específicos para visitas
+    async getVisitas() {
+        const result = await this.makeRequest('/api/visitas');
+        
+        // Actualizar localStorage con los datos reales
+        if (result && result.visitas) {
+            localStorage.setItem('psk_visit_count', result.visitas);
+        }
+        
+        return result;
+    }
+
+    async incrementarVisita() {
+        const result = await this.makeRequest('/api/visitas/incrementar', {
+            method: 'POST'
+        });
+        
+        // Actualizar localStorage con los datos reales
+        if (result && result.visitas) {
+            localStorage.setItem('psk_visit_count', result.visitas);
+        }
+        
+        return result;
+    }
+
+    // Métodos heredados (mantener compatibilidad)
     async getStats() {
-        return this.makeRequest('/stats');
+        return this.makeRequest('/api/stats');
     }
 
     async recordVisit() {
-        const result = await this.makeRequest('/stats/visit', {
+        const result = await this.makeRequest('/api/stats/visit', {
             method: 'POST',
             body: JSON.stringify({
                 sessionId: this.sessionId,
@@ -94,7 +135,7 @@ class ApiClient {
     }
 
     async recordGameResult(gameType, result, duration = null) {
-        const response = await this.makeRequest('/games/result', {
+        const response = await this.makeRequest('/api/games/result', {
             method: 'POST',
             body: JSON.stringify({
                 sessionId: this.sessionId,
@@ -120,11 +161,11 @@ class ApiClient {
     }
 
     async getGameHistory(limit = 10) {
-        return this.makeRequest(`/games/history/${this.sessionId}?limit=${limit}`);
+        return this.makeRequest(`/api/games/history/${this.sessionId}?limit=${limit}`);
     }
 
     async updateActivity(page, timeSpent = null) {
-        return this.makeRequest('/sessions/activity', {
+        return this.makeRequest('/api/sessions/activity', {
             method: 'POST',
             body: JSON.stringify({
                 sessionId: this.sessionId,
@@ -135,15 +176,15 @@ class ApiClient {
     }
 
     async getPopularNumbers() {
-        return this.makeRequest('/games/roulette/popular-numbers');
+        return this.makeRequest('/api/games/roulette/popular-numbers');
     }
 
     async getActiveUsers() {
-        return this.makeRequest('/sessions/active');
+        return this.makeRequest('/api/sessions/active');
     }
 
     async getUserStats() {
-        return this.makeRequest(`/stats/user/${this.sessionId}`);
+        return this.makeRequest(`/api/stats/user/${this.sessionId}`);
     }
 
     // Método para inicializar la conexión con la API
@@ -151,7 +192,10 @@ class ApiClient {
         if (this.initialized) return;
         
         try {
-            // Registrar visita
+            // Incrementar visita usando el endpoint específico
+            await this.incrementarVisita();
+            
+            // Registrar visita en el sistema de sesiones (si existe)
             await this.recordVisit();
             
             // Actualizar actividad
@@ -187,4 +231,3 @@ window.apiClient = new ApiClient();
 document.addEventListener('DOMContentLoaded', () => {
     window.apiClient.initialize();
 });
-window.apiClient = new ApiClient();

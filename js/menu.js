@@ -71,18 +71,29 @@ class MenuPrincipal {
 
     async loadStatsFromAPI() {
         try {
-            const stats = await window.apiClient.getStats();
+            // Obtener visitas del endpoint específico
+            const visitasData = await window.apiClient.getVisitas();
             
-            // Actualizar contadores con datos de la API
-            document.getElementById('visit-counter').textContent = stats.totalVisits.toLocaleString();
-            
-            // Actualizar usuarios online
-            document.getElementById('online-counter').textContent = stats.activeUsers;
-            
-            // Actualizar juegos jugados si existe el elemento
-            const gamesElement = document.querySelector('[data-stat="games"]');
-            if (gamesElement) {
-                gamesElement.textContent = stats.totalGamesPlayed.toLocaleString();
+            if (visitasData && visitasData.visitas) {
+                document.getElementById('visit-counter').textContent = visitasData.visitas.toLocaleString();
+            }
+
+            // Obtener otras estadísticas si existen
+            try {
+                const stats = await window.apiClient.getStats();
+                
+                // Actualizar usuarios online
+                if (stats.activeUsers) {
+                    document.getElementById('online-counter').textContent = stats.activeUsers;
+                }
+                
+                // Actualizar juegos jugados si existe el elemento
+                const gamesElement = document.querySelector('[data-stat="games"]');
+                if (gamesElement && stats.totalGamesPlayed) {
+                    gamesElement.textContent = stats.totalGamesPlayed.toLocaleString();
+                }
+            } catch (statsError) {
+                console.log('Estadísticas adicionales no disponibles');
             }
         } catch (error) {
             console.log('Usando estadísticas locales');
