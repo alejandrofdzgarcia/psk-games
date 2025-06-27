@@ -75,7 +75,19 @@ class MenuPrincipal {
             const visitasData = await window.apiClient.getVisitas();
             
             if (visitasData && visitasData.visitas) {
-                document.getElementById('visit-counter').textContent = visitasData.visitas.toLocaleString();
+                fetch("https://psk-games-api.onrender.com/api/visitas")
+                    .then(res => res.json())
+                    .then(data => {
+                    const contador = document.getElementById('visit-counter');
+                    if (contador && typeof data.visitas === 'number') {
+                        contador.textContent = data.visitas.toLocaleString();
+                    } else {
+                        console.error("No se encontró 'visitas' en la respuesta.");
+                    }
+                    })
+                    .catch(err => {
+                    console.error("Error al obtener las visitas:", err);
+                    });
             }
 
             // Obtener otras estadísticas si existen
@@ -111,9 +123,32 @@ class MenuPrincipal {
     }
 
     updateVisitCounter() {
-        this.visitCount++;
+        fetch("https://psk-games-api.onrender.com/api/visitas/incrementar", {
+            method: "POST"
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("✅ Visitas incrementadas:", data.visitas);
+        })
+        .catch(err => {
+            console.error("❌ Error al incrementar visitas:", err);
+        });
+        
         localStorage.setItem('psk_visit_count', this.visitCount);
-        document.getElementById('visit-counter').textContent = this.visitCount.toLocaleString();
+
+        fetch("https://psk-games-api.onrender.com/api/visitas")
+            .then(res => res.json())
+            .then(data => {
+            const contador = document.getElementById('visit-counter');
+            if (contador && typeof data.visitas === 'number') {
+                contador.textContent = data.visitas.toLocaleString();
+            } else {
+                console.error("No se encontró 'visitas' en la respuesta.");
+            }
+            })
+            .catch(err => {
+            console.error("Error al obtener las visitas:", err);
+            });
     }
 
     // Simular usuarios en línea
