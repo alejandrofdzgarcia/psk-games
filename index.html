@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Interactiva</title>
+    <link rel="stylesheet" href="estilos/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Ruleta de la Suerte</h1>
+        <p class="subtitle">Elige tu tipo de ruleta favorita</p>
+        
+        <div class="menu-grid">
+            <div class="menu-card" onclick="navigateTo('ruleta-personalizada.html')">
+                <div class="card-icon">🎲</div>
+                <h3>Ruleta Personalizada</h3>
+                <p>Crea tu propia ruleta con opciones personalizadas</p>
+                <div class="card-button">Jugar</div>
+            </div>
+
+            <div class="menu-card" onclick="navigateTo('ruleta-comida.html')">
+                <div class="card-icon">🍕</div>
+                <h3>Ruleta de Comida</h3>
+                <p>¿No sabes qué comer? ¡Deja que la ruleta decida!</p>
+                <div class="card-button">Jugar</div>
+            </div>
+
+            <div class="menu-card" onclick="navigateTo('ruleta-actividades.html')">
+                <div class="card-icon">🎮</div>
+                <h3>Ruleta de Actividades</h3>
+                <p>Encuentra actividades divertidas para hacer hoy</p>
+                <div class="card-button">Jugar</div>
+            </div>
+
+            <div class="menu-card" onclick="navigateTo('ruleta-decisiones.html')">
+                <div class="card-icon">🤔</div>
+                <h3>Ruleta de Decisiones</h3>
+                <p>Toma decisiones importantes con ayuda del azar</p>
+                <div class="card-button">Jugar</div>
+            </div>
+
+            <div class="menu-card" onclick="navigateTo('ruleta-colores.html')">
+                <div class="card-icon">🌈</div>
+                <h3>Ruleta de Colores</h3>
+                <p>Selecciona colores aleatorios para tus proyectos</p>
+                <div class="card-button">Jugar</div>
+            </div>
+
+            <div class="menu-card" onclick="navigateTo('ruleta-numeros.html')">
+                <div class="card-icon">🔢</div>
+                <h3>Ruleta de Números</h3>
+                <p>Genera números aleatorios dentro de un rango</p>
+                <div class="card-button">Jugar</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Hecho con ❤️ para tomar decisiones divertidas</p>
+        </div>
+    </div>
+
+    <script src="js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Personalizada - Ruleta de la Suerte</title>
+    <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="estilos/ruleta-styles.css">
+</head>
+<body>
+    <div class="navigation">
+        <button class="back-button" onclick="volverAlMenu()">← Volver al Menú</button>
+    </div>
+
+    <div class="container">
+        <h1>🎲 Ruleta Personalizada</h1>
+        <p class="subtitle">Crea tu propia ruleta con las opciones que quieras</p>
+        
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- Las secciones se generarán dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="spin-button" id="spinButton">¡GIRAR RULETA!</button>
+            <button class="reset-button" id="resetButton">Reiniciar</button>
+        </div>
+
+        <div class="options-container">
+            <div class="options-input">
+                <input type="text" class="option-input" id="newOption" placeholder="Escribe una opción..." maxlength="20">
+                <button class="add-option-button" id="addOption">+ Agregar</button>
+            </div>
+            
+            <div class="options-list" id="optionsList">
+                <!-- Las opciones se mostrarán aquí -->
+            </div>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script src="js/menu.js"></script>
+    <script src="js/ruleta.js"></script>
+</body>
+</html>
