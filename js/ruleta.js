@@ -9,16 +9,64 @@ class Ruleta {
             "Opción 6"
         ];
         this.colores = [
-            '#DC143C', '#228B22', '#DC143C', '#000000', '#DC143C', '#228B22', 
-            '#DC143C', '#000000', '#DC143C', '#228B22', '#DC143C', '#000000',
-            '#DC143C', '#228B22', '#DC143C', '#000000', '#DC143C', '#228B22'
+            '#DC143C', '#228B22', '#1E90FF', '#FF8C00', '#9370DB', '#FF1493', 
+            '#00CED1', '#32CD32', '#FFD700', '#FF6347', '#8A2BE2', '#00FF7F',
+            '#FF69B4', '#4169E1', '#FFA500', '#8B008B', '#00FA9A', '#FF4500'
         ];
         this.girando = false;
         this.rotacionActual = 0;
+        this.canvas = null;
+        this.ctx = null;
+        this.centerX = 200;
+        this.centerY = 200;
+        this.outerRadius = 180;
+        this.innerRadius = 30;
+        this.audioContext = null;
+        this.ultimoSegmento = null;
         
+        this.initAudio();
+        this.initCanvas();
         this.initEventListeners();
-        this.actualizarRuleta();
+        this.dibujarRuleta();
         this.mostrarOpciones();
+    }
+
+    initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Audio no disponible');
+        }
+    }
+
+    reproducirSonidoTic() {
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.1);
+    }
+
+    initCanvas() {
+        this.canvas = document.getElementById('wheelCanvas');
+        if (!this.canvas) {
+            console.error('Canvas no encontrado');
+            return;
+        }
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = 400;
+        this.canvas.height = 400;
     }
 
     initEventListeners() {
@@ -45,65 +93,151 @@ class Ruleta {
         });
     }
 
-    actualizarRuleta() {
-        const wheel = document.getElementById('wheel');
-        wheel.innerHTML = '';
+    dibujarRuleta() {
+        if (!this.ctx) return;
+
+        // Limpiar el canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         if (this.opciones.length === 0) {
-            wheel.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px; color: rgba(255,255,255,0.7);">Agrega opciones para comenzar</div>';
+            this.dibujarMensajeVacio();
             return;
         }
 
-        const anguloPorSeccion = 360 / this.opciones.length;
+        const anguloPorSegmento = 360 / this.opciones.length;
 
+        // Guardar el estado del contexto
+        this.ctx.save();
+
+        // Aplicar rotación
+        this.ctx.translate(this.centerX, this.centerY);
+        this.ctx.rotate(this.gradosARadianes(this.rotacionActual));
+        this.ctx.translate(-this.centerX, -this.centerY);
+
+        // Dibujar cada segmento
         this.opciones.forEach((opcion, index) => {
-            const seccion = document.createElement('div');
-            seccion.className = 'wheel-section';
-            seccion.style.backgroundColor = this.colores[index % this.colores.length];
+            const anguloInicio = index * anguloPorSegmento;
+            const anguloFin = (index + 1) * anguloPorSegmento;
             
-            // Crear una sección triangular que apunte al centro
-            const anguloInicio = index * anguloPorSeccion;
-            const anguloFin = (index + 1) * anguloPorSeccion;
-            
-            // Posicionar la sección usando clip-path para crear forma triangular
-            seccion.style.clipPath = `polygon(50% 50%, 
-                ${50 + 50 * Math.cos((anguloInicio - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((anguloInicio - 90) * Math.PI / 180)}%, 
-                ${50 + 50 * Math.cos((anguloFin - 90) * Math.PI / 180)}% ${50 + 50 * Math.sin((anguloFin - 90) * Math.PI / 180)}%)`;
-            
-            // Crear el texto de la opción
-            const texto = document.createElement('div');
-            texto.className = 'wheel-text';
-            texto.textContent = opcion;
-            
-            // Posicionar el texto en el centro de la sección
-            const anguloMedio = (anguloInicio + anguloFin) / 2;
-            const radioTexto = 60; // Distancia del centro donde aparece el texto
-            const x = 50 + radioTexto * Math.cos((anguloMedio - 90) * Math.PI / 180);
-            const y = 50 + radioTexto * Math.sin((anguloMedio - 90) * Math.PI / 180);
-            
-            texto.style.position = 'absolute';
-            texto.style.left = x + '%';
-            texto.style.top = y + '%';
-            texto.style.transform = 'translate(-50%, -50%)';
-            texto.style.color = 'white';
-            texto.style.fontWeight = 'bold';
-            texto.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
-            texto.style.fontSize = opcion.length > 10 ? '12px' : '14px';
-            texto.style.pointerEvents = 'none';
-            texto.style.zIndex = '2';
-
-            wheel.appendChild(seccion);
-            wheel.appendChild(texto);
+            this.dibujarSegmento(anguloInicio, anguloFin, this.colores[index % this.colores.length], opcion);
         });
 
-        // Agregar el centro de la ruleta
-        const centro = document.createElement('div');
-        centro.className = 'wheel-center';
-        wheel.appendChild(centro);
+        // Restaurar el estado del contexto
+        this.ctx.restore();
+
+        // Dibujar el centro de la ruleta
+        this.dibujarCentro();
+    }
+
+    dibujarSegmento(anguloInicio, anguloFin, color, texto) {
+        const startAngleRad = this.gradosARadianes(anguloInicio - 90);
+        const endAngleRad = this.gradosARadianes(anguloFin - 90);
+
+        // Dibujar la forma del segmento
+        this.ctx.beginPath();
+        this.ctx.arc(this.centerX, this.centerY, this.outerRadius, startAngleRad, endAngleRad);
+        this.ctx.arc(this.centerX, this.centerY, this.innerRadius, endAngleRad, startAngleRad, true);
+        this.ctx.closePath();
+
+        // Rellenar el segmento
+        this.ctx.fillStyle = color;
+        this.ctx.fill();
+
+        // Borde del segmento
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+
+        // Dibujar el texto
+        this.dibujarTextoSegmento(anguloInicio, anguloFin, texto);
+    }
+
+    dibujarTextoSegmento(anguloInicio, anguloFin, texto) {
+        const anguloMedio = (anguloInicio + anguloFin) / 2;
+        const anguloMedioRad = this.gradosARadianes(anguloMedio - 90);
+        
+        // Calcular posición del texto
+        const radioTexto = (this.outerRadius + this.innerRadius) / 2;
+        const x = this.centerX + Math.cos(anguloMedioRad) * radioTexto;
+        const y = this.centerY + Math.sin(anguloMedioRad) * radioTexto;
+
+        // Guardar el estado del contexto
+        this.ctx.save();
+
+        // Configurar el texto
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = `bold ${texto.length > 10 ? '12' : '14'}px Arial`;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 3;
+        this.ctx.shadowOffsetX = 1;
+        this.ctx.shadowOffsetY = 1;
+
+        // Rotar el texto para que sea legible
+        this.ctx.translate(x, y);
+        if (anguloMedio > 90 && anguloMedio < 270) {
+            this.ctx.rotate(this.gradosARadianes(anguloMedio + 180));
+        } else {
+            this.ctx.rotate(this.gradosARadianes(anguloMedio));
+        }
+
+        // Dibujar el texto
+        this.ctx.fillText(texto, 0, 0);
+
+        // Restaurar el estado del contexto
+        this.ctx.restore();
+    }
+
+    dibujarCentro() {
+        // Círculo exterior del centro
+        this.ctx.beginPath();
+        this.ctx.arc(this.centerX, this.centerY, this.innerRadius, 0, 2 * Math.PI);
+        
+        // Gradiente para el centro
+        const gradient = this.ctx.createRadialGradient(
+            this.centerX, this.centerY, 0,
+            this.centerX, this.centerY, this.innerRadius
+        );
+        gradient.addColorStop(0, '#DAA520');
+        gradient.addColorStop(0.5, '#B8860B');
+        gradient.addColorStop(1, '#8B7355');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+        
+        // Borde del centro
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
+
+        // Estrella en el centro
+        this.ctx.fillStyle = '#8B4513';
+        this.ctx.font = 'bold 20px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('★', this.centerX, this.centerY);
+    }
+
+    dibujarMensajeVacio() {
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        this.ctx.font = '18px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText('Agrega opciones para comenzar', this.centerX, this.centerY);
+    }
+
+    gradosARadianes(grados) {
+        return grados * Math.PI / 180;
     }
 
     girarRuleta() {
         if (this.girando || this.opciones.length === 0) return;
+
+        // Inicializar AudioContext en el primer clic del usuario
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
 
         this.girando = true;
         const spinButton = document.getElementById('spinButton');
@@ -114,38 +248,78 @@ class Ruleta {
         result.textContent = '';
         result.classList.remove('winner-animation');
 
-        // Generar rotación aleatoria (múltiples vueltas + ángulo final)
+        // Generar rotación aleatoria con más realismo
         const vueltasMinimas = 5;
-        const vueltasExtras = Math.floor(Math.random() * 5);
+        const vueltasExtras = Math.random() * 5;
         const anguloFinal = Math.random() * 360;
         const rotacionTotal = (vueltasMinimas + vueltasExtras) * 360 + anguloFinal;
 
-        this.rotacionActual += rotacionTotal;
+        // Animación más suave usando requestAnimationFrame
+        const rotacionInicial = this.rotacionActual;
+        const rotacionObjetivo = rotacionInicial + rotacionTotal;
+        const duracion = 4000; // 4 segundos
+        const tiempoInicio = Date.now();
+        this.ultimoSegmento = null;
 
-        const wheel = document.getElementById('wheel');
-        wheel.style.transform = `rotate(${this.rotacionActual}deg)`;
+        const animar = () => {
+            const tiempoActual = Date.now();
+            const tiempoTranscurrido = tiempoActual - tiempoInicio;
+            const progreso = Math.min(tiempoTranscurrido / duracion, 1);
 
+            // Función de easing para desaceleración suave
+            const easeOut = 1 - Math.pow(1 - progreso, 3);
+            
+            this.rotacionActual = rotacionInicial + (rotacionTotal * easeOut);
+            this.dibujarRuleta();
+
+            // Efectos de sonido durante la rotación
+            this.verificarCambioSegmento();
+
+            if (progreso < 1) {
+                requestAnimationFrame(animar);
+            } else {
+                this.completarGiro();
+            }
+        };
+
+        requestAnimationFrame(animar);
+    }
+
+    verificarCambioSegmento() {
+        if (!this.audioContext || this.opciones.length === 0) return;
+
+        const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
+        const anguloPorSegmento = 360 / this.opciones.length;
+        const segmentoActual = Math.floor(anguloNormalizado / anguloPorSegmento);
+
+        if (this.ultimoSegmento !== null && this.ultimoSegmento !== segmentoActual) {
+            this.reproducirSonidoTic();
+        }
+        
+        this.ultimoSegmento = segmentoActual;
+    }
+
+    completarGiro() {
         // Calcular el ganador
-        setTimeout(() => {
-            // El puntero está en la parte superior (270 grados), ajustamos el cálculo
-            const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
-            const anguloPorSeccion = 360 / this.opciones.length;
-            const indiceGanador = Math.floor(anguloNormalizado / anguloPorSeccion);
-            const ganador = this.opciones[indiceGanador];
+        const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
+        const anguloPorSegmento = 360 / this.opciones.length;
+        const indiceGanador = Math.floor(anguloNormalizado / anguloPorSegmento);
+        const ganador = this.opciones[indiceGanador];
 
-            // Mostrar resultado
-            result.textContent = `🎉 ¡${ganador}! 🎉`;
-            result.classList.add('winner-animation');
+        // Mostrar resultado
+        const result = document.getElementById('result');
+        result.textContent = `🎉 ¡${ganador}! 🎉`;
+        result.classList.add('winner-animation');
 
-            // Efectos de sonido simulados con console
-            console.log(`🎉 ¡GANADOR: ${ganador}! 🎉`);
+        // Efectos adicionales
+        this.crearConfetti();
+        console.log(`🎉 ¡GANADOR: ${ganador}! 🎉`);
 
-            // Resetear botón
-            this.girando = false;
-            spinButton.disabled = false;
-            spinButton.textContent = '¡GIRAR RULETA!';
-
-        }, 4000); // Duración de la animación
+        // Resetear botón
+        this.girando = false;
+        const spinButton = document.getElementById('spinButton');
+        spinButton.disabled = false;
+        spinButton.textContent = '¡GIRAR RULETA!';
     }
 
     agregarOpcion() {
@@ -155,7 +329,7 @@ class Ruleta {
         if (nuevaOpcion && !this.opciones.includes(nuevaOpcion)) {
             this.opciones.push(nuevaOpcion);
             input.value = '';
-            this.actualizarRuleta();
+            this.dibujarRuleta();
             this.mostrarOpciones();
         } else if (this.opciones.includes(nuevaOpcion)) {
             alert('Esta opción ya existe');
@@ -165,7 +339,7 @@ class Ruleta {
     eliminarOpcion(index) {
         if (this.opciones.length > 1) {
             this.opciones.splice(index, 1);
-            this.actualizarRuleta();
+            this.dibujarRuleta();
             this.mostrarOpciones();
         }
     }
@@ -199,10 +373,9 @@ class Ruleta {
         if (this.girando) return;
 
         this.rotacionActual = 0;
-        const wheel = document.getElementById('wheel');
-        const result = document.getElementById('result');
+        this.dibujarRuleta();
         
-        wheel.style.transform = 'rotate(0deg)';
+        const result = document.getElementById('result');
         result.textContent = '';
         result.classList.remove('winner-animation');
 
@@ -217,8 +390,49 @@ class Ruleta {
                 "Opción 5",
                 "Opción 6"
             ];
-            this.actualizarRuleta();
+            this.dibujarRuleta();
             this.mostrarOpciones();
+        }
+    }
+
+    crearConfetti() {
+        // Simulación de confetti mejorada
+        for (let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.width = Math.random() * 8 + 4 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.backgroundColor = this.colores[Math.floor(Math.random() * this.colores.length)];
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '1000';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                document.body.appendChild(confetti);
+                
+                // Animación de caída mejorada
+                let position = -10;
+                let rotation = 0;
+                let velocity = Math.random() * 3 + 2;
+                const wind = (Math.random() - 0.5) * 2;
+                
+                const fall = setInterval(() => {
+                    position += velocity;
+                    rotation += 5;
+                    velocity += 0.1; // Aceleración por gravedad
+                    
+                    confetti.style.top = position + 'px';
+                    confetti.style.transform = `rotate(${rotation}deg) translateX(${wind * position * 0.01}px)`;
+                    
+                    if (position > window.innerHeight + 20) {
+                        clearInterval(fall);
+                        confetti.remove();
+                    }
+                }, 20);
+            }, i * 30);
         }
     }
 
@@ -226,7 +440,7 @@ class Ruleta {
     configurarOpciones(nuevasOpciones) {
         if (Array.isArray(nuevasOpciones) && nuevasOpciones.length > 0) {
             this.opciones = nuevasOpciones;
-            this.actualizarRuleta();
+            this.dibujarRuleta();
             this.mostrarOpciones();
         }
     }
@@ -237,54 +451,9 @@ class Ruleta {
     }
 }
 
-// Funciones auxiliares para efectos adicionales
-function crearConfetti() {
-    // Simulación de confetti con elementos DOM
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.style.position = 'fixed';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.top = '-10px';
-            confetti.style.width = '10px';
-            confetti.style.height = '10px';
-            confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'][Math.floor(Math.random() * 5)];
-            confetti.style.pointerEvents = 'none';
-            confetti.style.zIndex = '1000';
-            confetti.style.borderRadius = '50%';
-            
-            document.body.appendChild(confetti);
-            
-            // Animación de caída
-            let position = -10;
-            const fall = setInterval(() => {
-                position += 5;
-                confetti.style.top = position + 'px';
-                confetti.style.transform = `rotate(${position * 2}deg)`;
-                
-                if (position > window.innerHeight) {
-                    clearInterval(fall);
-                    confetti.remove();
-                }
-            }, 50);
-        }, i * 100);
-    }
-}
-
 // Inicializar la ruleta cuando se carga la página
 document.addEventListener('DOMContentLoaded', () => {
     window.ruleta = new Ruleta();
-    
-    // Agregar evento de confetti cuando hay un ganador
-    const originalGirar = window.ruleta.girarRuleta;
-    window.ruleta.girarRuleta = function() {
-        originalGirar.call(this);
-        
-        // Agregar confetti después del resultado
-        setTimeout(() => {
-            crearConfetti();
-        }, 4000);
-    };
 });
 
 // Ejemplos de uso que puedes llamar desde la consola del navegador:
