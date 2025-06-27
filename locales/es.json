@@ -25,9 +25,30 @@
     "language.spanish": "Español",
     "language.english": "English",
     
+    "roulette.custom.title": "Ruleta Personalizada",
     "roulette.custom.description": "Esta opción está en desarrollo",
+    "roulette.food.title": "Ruleta de Comida",
     "roulette.food.description": "Esta opción está en desarrollo",
+    "roulette.activities.title": "Ruleta de Actividades",
     "roulette.activities.description": "Esta opción está en desarrollo",
+    "roulette.decisions.title": "Ruleta de Decisiones",
     "roulette.decisions.description": "Esta opción está en desarrollo",
-    "roulette.colors.description": "Esta opción está en desarrollo"
+    "roulette.colors.title": "Ruleta de Colores",
+    "roulette.colors.description": "Esta opción está en desarrollo",
+    
+    "stats.visits": "Visitas:",
+    "stats.games": "Juegos:",
+    "stats.online": "En línea:",
+    
+    "footer.about.title": "Acerca de PSK Games",
+    "footer.about.description": "La mejor colección de ruletas interactivas para tomar decisiones de forma divertida.",
+    "footer.games.title": "Juegos Disponibles",
+    "footer.stats.title": "Estadísticas",
+    "footer.stats.games_played": "Partidas jugadas:",
+    "footer.stats.total_users": "Usuarios totales:",
+    "footer.stats.favorites": "Favoritos:",
+    "footer.version": "Versión 2.0 - Actualizado el 27/06/2025",
+    "footer.privacy": "Privacidad",
+    "footer.terms": "Términos",
+    "footer.contact": "Contacto"
 }

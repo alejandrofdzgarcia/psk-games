@@ -23,5 +23,32 @@
     
     "language.selector": "Language",
     "language.spanish": "Español",
-    "language.english": "English"
+    "language.english": "English",
+    
+    "roulette.custom.title": "Custom Roulette",
+    "roulette.custom.description": "This option is in development",
+    "roulette.food.title": "Food Roulette",
+    "roulette.food.description": "This option is in development",
+    "roulette.activities.title": "Activities Roulette",
+    "roulette.activities.description": "This option is in development",
+    "roulette.decisions.title": "Decisions Roulette",
+    "roulette.decisions.description": "This option is in development",
+    "roulette.colors.title": "Colors Roulette",
+    "roulette.colors.description": "This option is in development",
+    
+    "stats.visits": "Visits:",
+    "stats.games": "Games:",
+    "stats.online": "Online:",
+    
+    "footer.about.title": "About PSK Games",
+    "footer.about.description": "The best collection of interactive roulettes to make decisions in a fun way.",
+    "footer.games.title": "Available Games",
+    "footer.stats.title": "Statistics",
+    "footer.stats.games_played": "Games played:",
+    "footer.stats.total_users": "Total users:",
+    "footer.stats.favorites": "Favorites:",
+    "footer.version": "Version 2.0 - Updated on 27/06/2025",
+    "footer.privacy": "Privacy",
+    "footer.terms": "Terms",
+    "footer.contact": "Contact"
 }
