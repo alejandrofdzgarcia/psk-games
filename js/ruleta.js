@@ -16,6 +16,8 @@ class Ruleta {
         this.centerX = 200;
         this.centerY = 200;
         this.outerRadius = 180;
+        this.numberBandRadius = 160; // Radio para la banda de números
+        this.innerGameRadius = 140; // Radio interior del área de juego
         this.innerRadius = 30;
         this.audioContext = null;
         this.ultimoSegmento = null;
@@ -157,22 +159,45 @@ class Ruleta {
         const startAngleRad = this.gradosARadianes(anguloInicio - 90);
         const endAngleRad = this.gradosARadianes(anguloFin - 90);
 
-        // Dibujar la forma del segmento
+        // Dibujar la banda exterior dorada para los números
         this.ctx.beginPath();
         this.ctx.arc(this.centerX, this.centerY, this.outerRadius, startAngleRad, endAngleRad);
+        this.ctx.arc(this.centerX, this.centerY, this.numberBandRadius, endAngleRad, startAngleRad, true);
+        this.ctx.closePath();
+        
+        // Gradiente dorado para la banda de números
+        const bandGradient = this.ctx.createRadialGradient(
+            this.centerX, this.centerY, this.numberBandRadius,
+            this.centerX, this.centerY, this.outerRadius
+        );
+        bandGradient.addColorStop(0, '#FFD700');
+        bandGradient.addColorStop(0.5, '#FFA500');
+        bandGradient.addColorStop(1, '#DAA520');
+        
+        this.ctx.fillStyle = bandGradient;
+        this.ctx.fill();
+        
+        // Borde de la banda de números
+        this.ctx.strokeStyle = '#B8860B';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+
+        // Dibujar el segmento de color principal (área de juego)
+        this.ctx.beginPath();
+        this.ctx.arc(this.centerX, this.centerY, this.innerGameRadius, startAngleRad, endAngleRad);
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, endAngleRad, startAngleRad, true);
         this.ctx.closePath();
 
-        // Rellenar el segmento
+        // Rellenar el segmento con el color del número
         this.ctx.fillStyle = color;
         this.ctx.fill();
 
-        // Borde del segmento
+        // Borde del segmento principal
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
 
-        // Dibujar el texto
+        // Dibujar el texto en la banda dorada
         this.dibujarTextoSegmento(anguloInicio, anguloFin, texto);
     }
 
@@ -180,21 +205,21 @@ class Ruleta {
         const anguloMedio = (anguloInicio + anguloFin) / 2;
         const anguloMedioRad = this.gradosARadianes(anguloMedio - 90);
         
-        // Calcular posición del texto
-        const radioTexto = (this.outerRadius + this.innerRadius) / 2;
+        // Posicionar el texto en el centro de la banda dorada
+        const radioTexto = (this.outerRadius + this.numberBandRadius) / 2;
         const x = this.centerX + Math.cos(anguloMedioRad) * radioTexto;
         const y = this.centerY + Math.sin(anguloMedioRad) * radioTexto;
 
         // Guardar el estado del contexto
         this.ctx.save();
 
-        // Configurar el texto
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = `bold ${texto.length > 2 ? '10' : '14'}px Arial`;
+        // Configurar el texto con colores apropiados
+        this.ctx.fillStyle = '#8B4513'; // Color marrón oscuro para mejor contraste en la banda dorada
+        this.ctx.font = `bold ${texto.length > 2 ? '14' : '18'}px Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        this.ctx.shadowBlur = 3;
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.shadowBlur = 2;
         this.ctx.shadowOffsetX = 1;
         this.ctx.shadowOffsetY = 1;
 
@@ -214,30 +239,36 @@ class Ruleta {
     }
 
     dibujarCentro() {
-        // Círculo exterior del centro
+        // Círculo exterior del centro con gradiente más realista
         this.ctx.beginPath();
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, 0, 2 * Math.PI);
         
-        // Gradiente para el centro
+        // Gradiente radial más parecido a la imagen
         const gradient = this.ctx.createRadialGradient(
             this.centerX, this.centerY, 0,
             this.centerX, this.centerY, this.innerRadius
         );
-        gradient.addColorStop(0, '#DAA520');
-        gradient.addColorStop(0.5, '#B8860B');
-        gradient.addColorStop(1, '#8B7355');
+        gradient.addColorStop(0, '#8B4513'); // Marrón central
+        gradient.addColorStop(0.6, '#A0522D'); // Marrón medio
+        gradient.addColorStop(1, '#654321'); // Marrón oscuro en el borde
         
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
         
-        // Borde del centro
-        this.ctx.strokeStyle = '#654321';
+        // Borde del centro más definido
+        this.ctx.strokeStyle = '#2F1B14';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
 
-        // Estrella en el centro
-        this.ctx.fillStyle = '#8B4513';
-        this.ctx.font = 'bold 20px Arial';
+        // Círculo interior más pequeño
+        this.ctx.beginPath();
+        this.ctx.arc(this.centerX, this.centerY, this.innerRadius * 0.7, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#654321';
+        this.ctx.fill();
+        
+        // Estrella central más pequeña y dorada
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.font = 'bold 16px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText('★', this.centerX, this.centerY);
