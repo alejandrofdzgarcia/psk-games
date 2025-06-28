@@ -1,4 +1,11 @@
-# OS generated files
+# Archivos de desarrollo local que NO van a GitHub Pages
+node_modules/
+.env
+.env.local
+.env.development
+.env.production
+
+# Archivos del sistema
 .DS_Store
 .DS_Store?
 ._*
@@ -8,7 +15,7 @@ ehthumbs.db
 Thumbs.db
 
 # Editor files
-.vscode/
+.vscode/settings.json
 .idea/
 *.swp
 *.swo
@@ -18,6 +25,25 @@ Thumbs.db
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+
+# Scripts de desarrollo local (mantener para referencia pero no deployment)
+# cors-proxy.js - comentado para mantenerlo en repo
+# start-cors-proxy.bat - comentado para mantenerlo en repo
+
+# Archivos de deployment y test (INCLUIR en GitHub Pages)
+# Los siguientes archivos SÍ van al repositorio:
+# *.html
+# js/
+# estilos/
+# locales/
+# multimedia/
+# *.md
 yarn-error.log*
 
 # Runtime data

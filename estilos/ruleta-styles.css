@@ -488,6 +488,68 @@ html, body {
     transform: scale(1.05);
 }
 
+/* Indicador de estado de conexión */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-height: 32px;
+}
+
+.connection-status.connecting {
+    background: #2196F3;
+    color: white;
+}
+
+.connection-status.online {
+    background: #4CAF50;
+    color: white;
+}
+
+.connection-status.offline {
+    background: #ff9800;
+    color: white;
+}
+
+.connection-status.error {
+    background: #f44336;
+    color: white;
+}
+
+#status-icon {
+    font-size: 16px;
+    animation: pulse 2s infinite;
+}
+
+.connection-status.online #status-icon {
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive para el indicador */
+@media (max-width: 768px) {
+    .connection-status {
+        font-size: 12px;
+        padding: 6px 12px;
+        margin: 8px 0;
+    }
+    
+    #status-icon {
+        font-size: 14px;
+    }
+}
+
 /* Media Queries para Ruleta */
 
 /* Móviles pequeños (320px - 480px) */

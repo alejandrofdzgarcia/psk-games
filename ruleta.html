@@ -19,6 +19,12 @@
         <h1 data-i18n="roulette.title">🎲 Ruleta de Doble Vega</h1>
         <p class="subtitle" data-i18n="roulette.description">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
         
+        <!-- Indicador de estado de conexión -->
+        <div id="connection-status" class="connection-status">
+            <span id="status-icon">🔄</span>
+            <span id="status-text" data-i18n="status.connecting">Conectando...</span>
+        </div>
+        
         <div class="wheel-container">
             <div class="wheel-pointer"></div>
             <canvas id="wheelCanvas" width="400" height="400" class="wheel-canvas">

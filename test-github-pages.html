@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Test - GitHub Pages Deployment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .test-container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .warning { background: rgba(255, 152, 0, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #45a049; }
+        pre {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+    <script src="js/api-client.js"></script>
+</head>
+<body>
+    <h1>🧪 Test de Despliegue - GitHub Pages</h1>
+    <p>Esta página verifica que todo funcione correctamente en GitHub Pages.</p>
+
+    <div class="test-container">
+        <h2>🔍 Detección de Entorno</h2>
+        <div id="environment-info"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>🌐 Test de Conectividad API</h2>
+        <button onclick="testApiConnectivity()">Probar Conexión API</button>
+        <div id="api-test-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>📱 Test de Funcionalidades</h2>
+        <button onclick="testLocalStorage()">Test localStorage</button>
+        <button onclick="testI18n()">Test Idiomas</button>
+        <button onclick="testOfflineMode()">Test Modo Offline</button>
+        <div id="functionality-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>🎰 Test de Ruleta</h2>
+        <button onclick="testRouletteFiles()">Verificar Archivos de Ruleta</button>
+        <div id="roulette-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Resumen de Estado</h2>
+        <div id="summary"></div>
+    </div>
+
+    <script>
+        let testResults = {
+            environment: null,
+            api: null,
+            localStorage: null,
+            i18n: null,
+            offline: null,
+            roulette: null
+        };
+
+        // Test de detección de entorno
+        function detectEnvironment() {
+            const info = {
+                hostname: window.location.hostname,
+                isGitHubPages: window.location.hostname.includes('github.io'),
+                isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+                protocol: window.location.protocol,
+                apiClientAvailable: typeof window.apiClient !== 'undefined'
+            };
+
+            let html = '<h3>Información del Entorno:</h3>';
+            html += `<div class="status ${info.isGitHubPages ? 'success' : 'info'}">`;
+            html += `<strong>Hostname:</strong> ${info.hostname}<br>`;
+            html += `<strong>Protocolo:</strong> ${info.protocol}<br>`;
+            html += `<strong>GitHub Pages:</strong> ${info.isGitHubPages ? '✅ SÍ' : '❌ NO'}<br>`;
+            html += `<strong>Desarrollo Local:</strong> ${info.isDevelopment ? '✅ SÍ' : '❌ NO'}<br>`;
+            html += `<strong>API Client:</strong> ${info.apiClientAvailable ? '✅ Disponible' : '❌ No disponible'}`;
+            html += '</div>';
+
+            if (info.apiClientAvailable && window.apiClient) {
+                html += '<h4>Configuración API Client:</h4>';
+                html += '<pre>' + JSON.stringify({
+                    isGitHubPages: window.apiClient.isGitHubPages,
+                    isDevelopment: window.apiClient.isDevelopment,
+                    baseURL: window.apiClient.baseURL,
+                    offlineMode: window.apiClient.offlineMode
+                }, null, 2) + '</pre>';
+            }
+
+            document.getElementById('environment-info').innerHTML = html;
+            testResults.environment = info.isGitHubPages || info.isDevelopment;
+            updateSummary();
+        }
+
+        // Test de conectividad API
+        async function testApiConnectivity() {
+            const resultsDiv = document.getElementById('api-test-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Probando conectividad...</div>';
+
+            if (!window.apiClient) {
+                resultsDiv.innerHTML = '<div class="status error">❌ API Client no disponible</div>';
+                testResults.api = false;
+                updateSummary();
+                return;
+            }
+
+            try {
+                // Test 1: Incrementar visita
+                const visitResult = await window.apiClient.incrementarVisita();
+                
+                let html = '<h4>Resultados de Conectividad:</h4>';
+                
+                if (visitResult && visitResult.visitas) {
+                    html += '<div class="status success">✅ API funcionando - Visitas: ' + visitResult.visitas + '</div>';
+                    testResults.api = true;
+                } else if (visitResult && visitResult.success) {
+                    html += '<div class="status warning">⚠️ Modo offline - Datos locales funcionando</div>';
+                    testResults.api = 'offline';
+                } else {
+                    html += '<div class="status error">❌ Error en API</div>';
+                    testResults.api = false;
+                }
+
+                // Test 2: Stats
+                const statsResult = await window.apiClient.getStats();
+                if (statsResult) {
+                    html += '<div class="status info">📊 Stats disponibles</div>';
+                }
+
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+                testResults.api = false;
+            }
+            
+            updateSummary();
+        }
+
+        // Test de localStorage
+        function testLocalStorage() {
+            const resultsDiv = document.getElementById('functionality-results');
+            
+            try {
+                const testKey = 'psk_test_' + Date.now();
+                const testValue = 'test_value_' + Math.random();
+                
+                localStorage.setItem(testKey, testValue);
+                const retrieved = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (retrieved === testValue) {
+                    resultsDiv.innerHTML += '<div class="status success">✅ localStorage funcionando</div>';
+                    testResults.localStorage = true;
+                } else {
+                    throw new Error('Valor no coincide');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="status error">❌ localStorage no disponible: ' + error.message + '</div>';
+                testResults.localStorage = false;
+            }
+            
+            updateSummary();
+        }
+
+        // Test de internacionalización
+        function testI18n() {
+            const resultsDiv = document.getElementById('functionality-results');
+            
+            try {
+                // Verificar si el archivo i18n.js está cargado
+                if (typeof window.changeLanguage === 'function') {
+                    resultsDiv.innerHTML += '<div class="status success">✅ Sistema de idiomas disponible</div>';
+                    testResults.i18n = true;
+                } else {
+                    throw new Error('Función changeLanguage no encontrada');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += '<div class="status error">❌ Sistema de idiomas no disponible: ' + error.message + '</div>';
+                testResults.i18n = false;
+            }
+            
+            updateSummary();
+        }
+
+        // Test de modo offline
+        function testOfflineMode() {
+            const resultsDiv = document.getElementById('functionality-results');
+            
+            if (!window.apiClient) {
+                resultsDiv.innerHTML += '<div class="status error">❌ API Client no disponible</div>';
+                testResults.offline = false;
+                updateSummary();
+                return;
+            }
+
+            // Forzar modo offline y probar
+            const originalOfflineMode = window.apiClient.offlineMode;
+            window.apiClient.offlineMode = true;
+            
+            window.apiClient.handleOfflineRequest('/test', {}).then(result => {
+                if (result && result.offline) {
+                    resultsDiv.innerHTML += '<div class="status success">✅ Modo offline funcionando</div>';
+                    testResults.offline = true;
+                } else {
+                    resultsDiv.innerHTML += '<div class="status error">❌ Modo offline no funciona</div>';
+                    testResults.offline = false;
+                }
+                
+                // Restaurar estado original
+                window.apiClient.offlineMode = originalOfflineMode;
+                updateSummary();
+            });
+        }
+
+        // Test de archivos de ruleta
+        function testRouletteFiles() {
+            const resultsDiv = document.getElementById('roulette-results');
+            resultsDiv.innerHTML = '<div class="status info">🔄 Verificando archivos...</div>';
+            
+            const filesToCheck = [
+                'js/ruleta.js',
+                'estilos/ruleta-styles.css',
+                'ruleta.html'
+            ];
+            
+            let html = '<h4>Verificación de Archivos:</h4>';
+            let allGood = true;
+            
+            Promise.all(filesToCheck.map(file => 
+                fetch(file)
+                    .then(response => ({ file, status: response.ok ? 'OK' : 'ERROR', code: response.status }))
+                    .catch(error => ({ file, status: 'ERROR', error: error.message }))
+            )).then(results => {
+                results.forEach(result => {
+                    if (result.status === 'OK') {
+                        html += `<div class="status success">✅ ${result.file}</div>`;
+                    } else {
+                        html += `<div class="status error">❌ ${result.file} - ${result.error || 'HTTP ' + result.code}</div>`;
+                        allGood = false;
+                    }
+                });
+                
+                testResults.roulette = allGood;
+                resultsDiv.innerHTML = html;
+                updateSummary();
+            });
+        }
+
+        // Actualizar resumen
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            const totalTests = Object.keys(testResults).length;
+            const completedTests = Object.values(testResults).filter(r => r !== null).length;
+            const passedTests = Object.values(testResults).filter(r => r === true || r === 'offline').length;
+            
+            let html = `<h3>Progreso: ${completedTests}/${totalTests} tests completados</h3>`;
+            
+            if (completedTests === totalTests) {
+                const percentage = Math.round((passedTests / totalTests) * 100);
+                
+                if (percentage >= 80) {
+                    html += `<div class="status success">🎉 ¡Excelente! ${percentage}% de tests pasados - Ready for GitHub Pages!</div>`;
+                } else if (percentage >= 60) {
+                    html += `<div class="status warning">⚠️ ${percentage}% de tests pasados - Debería funcionar pero con limitaciones</div>`;
+                } else {
+                    html += `<div class="status error">❌ Solo ${percentage}% de tests pasados - Revisar configuración</div>`;
+                }
+                
+                html += '<h4>Detalles:</h4>';
+                for (const [test, result] of Object.entries(testResults)) {
+                    const icon = result === true ? '✅' : result === 'offline' ? '⚠️' : result === false ? '❌' : '⏸️';
+                    const status = result === true ? 'Pasado' : result === 'offline' ? 'Offline OK' : result === false ? 'Fallido' : 'Pendiente';
+                    html += `<div>${icon} <strong>${test}:</strong> ${status}</div>`;
+                }
+            }
+            
+            summaryDiv.innerHTML = html;
+        }
+
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', () => {
+            detectEnvironment();
+            
+            // Auto-test en GitHub Pages
+            if (window.location.hostname.includes('github.io')) {
+                setTimeout(() => {
+                    testApiConnectivity();
+                    testLocalStorage();
+                    testI18n();
+                    testOfflineMode();
+                    testRouletteFiles();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

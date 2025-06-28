@@ -1,9 +1,46 @@
-// Cliente para conectar con la API
+// Cliente para conectar con la API - Optimizado para GitHub Pages
 class ApiClient {
     constructor() {
-        this.baseURL = 'https://psk-games-api.onrender.com';
+        // Detectar el entorno
+        this.isGitHubPages = window.location.hostname.includes('github.io');
+        this.isDevelopment = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' ||
+                           window.location.hostname.includes('192.168.');
+        
+        // Configuración específica para GitHub Pages
+        if (this.isGitHubPages) {
+            // Para GitHub Pages, usamos proxies públicos como fallback
+            this.apiUrls = [
+                'https://api.allorigins.win/raw?url=https://psk-games-api.onrender.com',
+                'https://corsproxy.io/?https://psk-games-api.onrender.com',
+                'https://cors-anywhere.herokuapp.com/https://psk-games-api.onrender.com',
+                // Fallback final: modo offline
+                null
+            ];
+        } else {
+            // Para desarrollo local
+            this.apiUrls = [
+                'http://localhost:3001', // Proxy local
+                'https://psk-games-api.onrender.com', // API original
+                'https://api.allorigins.win/raw?url=https://psk-games-api.onrender.com',
+                null // Fallback offline
+            ];
+        }
+        
+        this.currentApiIndex = 0;
+        this.baseURL = this.apiUrls[0];
         this.sessionId = this.generateSessionId();
         this.initialized = false;
+        this.offlineMode = false;
+        
+        // Datos locales como fallback completo
+        this.localData = {
+            stats: { gamesPlayed: 0, wins: 0, lastPlayed: null },
+            gameResults: [],
+            activities: []
+        };
+        
+        this.loadLocalData();
     }
 
     generateSessionId() {
@@ -16,28 +53,206 @@ class ApiClient {
     }
 
     async makeRequest(endpoint, options = {}) {
+        // Si estamos en modo offline, usar datos locales inmediatamente
+        if (this.offlineMode || this.baseURL === null) {
+            console.log('🔄 Usando modo offline para:', endpoint);
+            return this.handleOfflineRequest(endpoint, options);
+        }
+
         try {
-            const url = `${this.baseURL}${endpoint}`;
-            const config = {
+            let url;
+            let config = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
+                mode: 'cors',
+                credentials: 'omit',
                 ...options
             };
 
+            // Configurar URL según el tipo de proxy
+            if (this.baseURL.includes('allorigins.win')) {
+                // Para AllOrigins, necesitamos formatear la URL diferente
+                const targetUrl = encodeURIComponent(`https://psk-games-api.onrender.com${endpoint}`);
+                url = `https://api.allorigins.win/raw?url=${targetUrl}`;
+            } else if (this.baseURL.includes('corsproxy.io')) {
+                // Para corsproxy.io
+                url = `${this.baseURL}${endpoint}`;
+            } else {
+                // Para otros proxies o conexión directa
+                url = `${this.baseURL}${endpoint}`;
+            }
+
+            console.log(`🌐 Intentando petición a: ${url}`);
+
+            // Para GitHub Pages con ciertos proxies, añadir headers especiales
+            if (this.isGitHubPages) {
+                if (this.baseURL.includes('cors-anywhere')) {
+                    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+                }
+                // AllOrigins no necesita headers especiales
+            }
+
+            // Timeout más corto para fallar rápido
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            config.signal = controller.signal;
+
             const response = await fetch(url, config);
+            clearTimeout(timeoutId);
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log('✅ Petición exitosa');
             return data;
+            
         } catch (error) {
-            console.warn('Error en API:', error.message);
-            // Retornar datos por defecto en caso de error
-            return this.getFallbackData(endpoint);
+            console.warn(`⚠️ Error en API (${this.baseURL}):`, error.message);
+            
+            // Intentar con la siguiente URL disponible
+            return this.tryNextApiUrl(endpoint, options, error);
         }
+    }
+
+    async tryNextApiUrl(endpoint, options, lastError) {
+        this.currentApiIndex++;
+        
+        // Si hay más URLs disponibles, intentar con la siguiente
+        if (this.currentApiIndex < this.apiUrls.length && this.apiUrls[this.currentApiIndex] !== null) {
+            this.baseURL = this.apiUrls[this.currentApiIndex];
+            console.log(`🔄 Intentando con siguiente API: ${this.baseURL}`);
+            return this.makeRequest(endpoint, options);
+        }
+        
+        // Si no hay más URLs, activar modo offline
+        console.log('📴 Activando modo offline - usando datos locales');
+        this.offlineMode = true;
+        this.baseURL = null;
+        
+        // Mostrar notificación de modo offline
+        this.showOfflineNotification();
+        
+        return this.handleOfflineRequest(endpoint, options);
+    }
+
+    handleOfflineRequest(endpoint, options) {
+        console.log(`🔄 Manejando petición offline: ${endpoint}`);
+        
+        // Simular respuestas basadas en el endpoint
+        if (endpoint.includes('/sessions/active')) {
+            return Promise.resolve({
+                sessionId: this.sessionId,
+                active: true,
+                offline: true,
+                message: 'Sesión local activa'
+            });
+        }
+        
+        if (endpoint.includes('/games/results') && options.method === 'POST') {
+            // Guardar resultado localmente
+            const result = JSON.parse(options.body);
+            this.localData.gameResults.push({
+                ...result,
+                timestamp: new Date().toISOString(),
+                sessionId: this.sessionId
+            });
+            this.saveLocalData();
+            return Promise.resolve({ success: true, offline: true });
+        }
+        
+        if (endpoint.includes('/stats')) {
+            return Promise.resolve({
+                ...this.localData.stats,
+                offline: true
+            });
+        }
+        
+        // Respuesta genérica para otros endpoints
+        return Promise.resolve({
+            success: true,
+            offline: true,
+            message: 'Funcionando en modo offline'
+        });
+    }
+
+    showOfflineNotification() {
+        // Solo mostrar la notificación una vez por sesión
+        if (!sessionStorage.getItem('offline_notification_shown')) {
+            console.log('📴 MODO OFFLINE: La aplicación funcionará con datos locales');
+            sessionStorage.setItem('offline_notification_shown', 'true');
+            this.displayUserNotification('Modo offline activado - usando datos locales', 'info');
+        }
+    }
+
+    loadLocalData() {
+        try {
+            const savedData = localStorage.getItem('psk_local_data');
+            if (savedData) {
+                this.localData = { ...this.localData, ...JSON.parse(savedData) };
+            }
+        } catch (error) {
+            console.warn('No se pudieron cargar los datos locales:', error);
+        }
+    }
+
+    saveLocalData() {
+        try {
+            localStorage.setItem('psk_local_data', JSON.stringify(this.localData));
+        } catch (error) {
+            console.warn('No se pudieron guardar los datos locales:', error);
+        }
+    }
+
+
+
+    displayUserNotification(message, type = 'info') {
+        // Buscar contenedor de notificaciones o crear uno temporal
+        let notificationContainer = document.getElementById('notification-container');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notification-container';
+            notificationContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 300px;
+            `;
+            document.body.appendChild(notificationContainer);
+        }
+
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            background: ${type === 'success' ? '#4CAF50' : type === 'info' ? '#2196F3' : '#ff9800'};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        `;
+        
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        // Animar entrada
+        requestAnimationFrame(() => {
+            notification.style.transform = 'translateX(0)';
+        });
+
+        // Auto-remover después de 5 segundos
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 5000);
     }
 
     getFallbackData(endpoint) {
@@ -56,6 +271,16 @@ class ApiClient {
                 visitas: newCount
             };
         }
+        if (endpoint.includes('/stats/visit')) {
+            const currentCount = parseInt(localStorage.getItem('psk_visit_count') || '1234');
+            const newCount = currentCount + 1;
+            localStorage.setItem('psk_visit_count', newCount);
+            return {
+                success: true,
+                visitCount: newCount,
+                totalVisits: newCount
+            };
+        }
         if (endpoint.includes('/stats') && !endpoint.includes('/visit')) {
             return {
                 totalVisits: parseInt(localStorage.getItem('psk_visit_count') || '1234'),
@@ -71,17 +296,41 @@ class ApiClient {
                 }
             };
         }
-        if (endpoint.includes('/stats/visit')) {
-            const currentCount = parseInt(localStorage.getItem('psk_visit_count') || '1234');
-            const newCount = currentCount + 1;
-            localStorage.setItem('psk_visit_count', newCount);
+        if (endpoint.includes('/games/result')) {
+            // Simular guardado exitoso del resultado
+            const currentGames = parseInt(localStorage.getItem('psk_games_played') || '0');
+            localStorage.setItem('psk_games_played', currentGames + 1);
             return {
                 success: true,
-                visitCount: newCount,
-                totalVisits: newCount
+                offline: true,
+                message: 'Resultado guardado localmente'
             };
         }
-        return { success: false };
+        if (endpoint.includes('/games/roulette/popular-numbers')) {
+            return {
+                popularNumbers: [7, 17, 23, 32, 0, 21, 14, 9, 18, 29],
+                offline: true
+            };
+        }
+        if (endpoint.includes('/sessions/active')) {
+            return {
+                activeUsers: Math.floor(Math.random() * 5) + 1,
+                sessionId: this.sessionId,
+                offline: true
+            };
+        }
+        if (endpoint.includes('/sessions/activity')) {
+            return {
+                success: true,
+                offline: true,
+                message: 'Actividad registrada localmente'
+            };
+        }
+        return { 
+            success: false, 
+            offline: true, 
+            message: 'Endpoint no disponible en modo offline' 
+        };
     }
 
     // Métodos de la API
@@ -192,8 +441,15 @@ class ApiClient {
         if (this.initialized) return;
         
         try {
+            console.log('🔄 Inicializando conexión con API...');
+            
             // Incrementar visita usando el endpoint específico
-            await this.incrementarVisita();
+            const visitResult = await this.incrementarVisita();
+            
+            // Si la respuesta es del fallback, significa que hay problemas de conectividad
+            if (visitResult && visitResult.visitas && !visitResult.success) {
+                throw new Error('Using fallback data');
+            }
             
             // Registrar visita en el sistema de sesiones (si existe)
             await this.recordVisit();
@@ -203,9 +459,12 @@ class ApiClient {
             await this.updateActivity(currentPage);
             
             this.initialized = true;
-            console.log('✅ API Client inicializado correctamente');
+            console.log('✅ API Client inicializado correctamente - Conectado al servidor');
+            this.displayUserNotification('Conectado al servidor - Estadísticas en tiempo real', 'success');
+            
         } catch (error) {
             console.log('⚠️ API no disponible, usando datos locales');
+            this.initialized = true; // Marcar como inicializado aunque sea en modo offline
         }
     }
 

@@ -40,6 +40,12 @@
     "stats.games": "Juegos:",
     "stats.online": "En línea:",
     
+    "status.connecting": "Conectando...",
+    "status.online": "Conectado al servidor",
+    "status.offline": "Modo offline",
+    "status.proxy": "Conectado vía proxy",
+    "status.error": "Error de conexión",
+    
     "footer.about.title": "Acerca de PSK Games",
     "footer.about.description": "La mejor colección de ruletas interactivas para tomar decisiones de forma divertida.",
     "footer.games.title": "Juegos Disponibles",
