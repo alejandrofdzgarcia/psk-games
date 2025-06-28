@@ -16,15 +16,21 @@ class Ruleta {
         this.centerX = 200;
         this.centerY = 200;
         this.outerRadius = 180;
-        this.numberBandRadius = 160; // Radio para la banda de números
-        this.innerGameRadius = 140; // Radio interior del área de juego
-        this.innerRadius = 30;
+        this.innerRadius = 40;
         this.audioContext = null;
         this.ultimoSegmento = null;
+        
+        // Variables para el sistema de apuestas
+        this.bankValue = 1000;
+        this.currentBet = 0;
+        this.selectedChip = 5;
+        this.bets = [];
+        this.numRed = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
         
         this.initAudio();
         this.initCanvas();
         this.initEventListeners();
+        this.buildBettingBoard();
         this.dibujarRuleta();
     }
 
@@ -153,51 +159,31 @@ class Ruleta {
 
         // Dibujar el centro de la ruleta
         this.dibujarCentro();
+        
+        // Dibujar el indicador/puntero en la parte superior
+        this.dibujarIndicador();
     }
 
     dibujarSegmento(anguloInicio, anguloFin, color, texto) {
         const startAngleRad = this.gradosARadianes(anguloInicio - 90);
         const endAngleRad = this.gradosARadianes(anguloFin - 90);
 
-        // Dibujar la banda exterior dorada para los números
+        // Dibujar el segmento principal
         this.ctx.beginPath();
         this.ctx.arc(this.centerX, this.centerY, this.outerRadius, startAngleRad, endAngleRad);
-        this.ctx.arc(this.centerX, this.centerY, this.numberBandRadius, endAngleRad, startAngleRad, true);
-        this.ctx.closePath();
-        
-        // Gradiente dorado para la banda de números
-        const bandGradient = this.ctx.createRadialGradient(
-            this.centerX, this.centerY, this.numberBandRadius,
-            this.centerX, this.centerY, this.outerRadius
-        );
-        bandGradient.addColorStop(0, '#FFD700');
-        bandGradient.addColorStop(0.5, '#FFA500');
-        bandGradient.addColorStop(1, '#DAA520');
-        
-        this.ctx.fillStyle = bandGradient;
-        this.ctx.fill();
-        
-        // Borde de la banda de números
-        this.ctx.strokeStyle = '#B8860B';
-        this.ctx.lineWidth = 1;
-        this.ctx.stroke();
-
-        // Dibujar el segmento de color principal (área de juego)
-        this.ctx.beginPath();
-        this.ctx.arc(this.centerX, this.centerY, this.innerGameRadius, startAngleRad, endAngleRad);
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, endAngleRad, startAngleRad, true);
         this.ctx.closePath();
 
-        // Rellenar el segmento con el color del número
+        // Rellenar el segmento con el color correspondiente
         this.ctx.fillStyle = color;
         this.ctx.fill();
 
-        // Borde del segmento principal
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        // Borde dorado/amarillo para simular los separadores metálicos
+        this.ctx.strokeStyle = '#FFD700';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
 
-        // Dibujar el texto en la banda dorada
+        // Dibujar el texto del número
         this.dibujarTextoSegmento(anguloInicio, anguloFin, texto);
     }
 
@@ -205,21 +191,21 @@ class Ruleta {
         const anguloMedio = (anguloInicio + anguloFin) / 2;
         const anguloMedioRad = this.gradosARadianes(anguloMedio - 90);
         
-        // Posicionar el texto en el centro de la banda dorada
-        const radioTexto = (this.outerRadius + this.numberBandRadius) / 2;
+        // Posicionar el texto más hacia el exterior, similar al ejemplo
+        const radioTexto = this.outerRadius - 25;
         const x = this.centerX + Math.cos(anguloMedioRad) * radioTexto;
         const y = this.centerY + Math.sin(anguloMedioRad) * radioTexto;
 
         // Guardar el estado del contexto
         this.ctx.save();
 
-        // Configurar el texto con colores apropiados
-        this.ctx.fillStyle = '#8B4513'; // Color marrón oscuro para mejor contraste en la banda dorada
-        this.ctx.font = `bold ${texto.length > 2 ? '14' : '18'}px Arial`;
+        // Configurar el texto (similar al ejemplo: blanco con sombra negra)
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = `bold ${texto.length > 1 ? '14' : '16'}px Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.shadowBlur = 2;
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        this.ctx.shadowBlur = 3;
         this.ctx.shadowOffsetX = 1;
         this.ctx.shadowOffsetY = 1;
 
@@ -239,39 +225,38 @@ class Ruleta {
     }
 
     dibujarCentro() {
-        // Círculo exterior del centro con gradiente más realista
+        // Dibujar el centro de la ruleta similar al ejemplo de referencia
         this.ctx.beginPath();
         this.ctx.arc(this.centerX, this.centerY, this.innerRadius, 0, 2 * Math.PI);
         
-        // Gradiente radial más parecido a la imagen
+        // Gradiente radial para simular el aspecto metálico del centro
         const gradient = this.ctx.createRadialGradient(
-            this.centerX, this.centerY, 0,
+            this.centerX - 10, this.centerY - 10, 0,
             this.centerX, this.centerY, this.innerRadius
         );
-        gradient.addColorStop(0, '#8B4513'); // Marrón central
-        gradient.addColorStop(0.6, '#A0522D'); // Marrón medio
-        gradient.addColorStop(1, '#654321'); // Marrón oscuro en el borde
+        gradient.addColorStop(0, '#F3C620');  // Dorado claro (similar al ejemplo)
+        gradient.addColorStop(0.6, '#DAA520'); // Dorado medio
+        gradient.addColorStop(1, '#1A1608');   // Sombra oscura
         
         this.ctx.fillStyle = gradient;
         this.ctx.fill();
         
-        // Borde del centro más definido
-        this.ctx.strokeStyle = '#2F1B14';
+        // Borde metálico
+        this.ctx.strokeStyle = '#B8860B';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
 
-        // Círculo interior más pequeño
+        // Círculo interior más pequeño para dar efecto de profundidad
         this.ctx.beginPath();
-        this.ctx.arc(this.centerX, this.centerY, this.innerRadius * 0.7, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#654321';
+        this.ctx.arc(this.centerX, this.centerY, this.innerRadius * 0.6, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#8B6914';
         this.ctx.fill();
         
-        // Estrella central más pequeña y dorada
-        this.ctx.fillStyle = '#FFD700';
-        this.ctx.font = 'bold 16px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText('★', this.centerX, this.centerY);
+        // Pequeño punto central
+        this.ctx.beginPath();
+        this.ctx.arc(this.centerX, this.centerY, 3, 0, 2 * Math.PI);
+        this.ctx.fillStyle = '#2F1B14';
+        this.ctx.fill();
     }
 
     dibujarMensajeVacio() {
@@ -281,6 +266,27 @@ class Ruleta {
         this.ctx.textBaseline = 'middle';
         const mensaje = window.i18n ? window.i18n.t('roulette.ready') : 'Ruleta de Casino Lista';
         this.ctx.fillText(mensaje, this.centerX, this.centerY);
+    }
+
+    dibujarIndicador() {
+        // Dibujar un pequeño triángulo/puntero en la parte superior para indicar el ganador
+        this.ctx.save();
+        
+        this.ctx.fillStyle = '#FFD700';
+        this.ctx.strokeStyle = '#B8860B';
+        this.ctx.lineWidth = 2;
+        
+        // Triángulo apuntando hacia el centro desde arriba
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.centerX, 10); // Punto superior
+        this.ctx.lineTo(this.centerX - 12, 30); // Punto izquierdo
+        this.ctx.lineTo(this.centerX + 12, 30); // Punto derecho
+        this.ctx.closePath();
+        
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        this.ctx.restore();
     }
 
     gradosARadianes(grados) {
@@ -345,9 +351,9 @@ class Ruleta {
     verificarCambioSegmento() {
         if (!this.audioContext || this.opciones.length === 0) return;
 
-        const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
+        const anguloNormalizado = (360 - (this.rotacionActual % 360)) % 360;
         const anguloPorSegmento = 360 / this.opciones.length;
-        const segmentoActual = Math.floor(anguloNormalizado / anguloPorSegmento);
+        const segmentoActual = Math.floor(anguloNormalizado / anguloPorSegmento) % this.opciones.length;
 
         if (this.ultimoSegmento !== null && this.ultimoSegmento !== segmentoActual) {
             this.reproducirSonidoTic();
@@ -357,33 +363,44 @@ class Ruleta {
     }
 
     completarGiro() {
-        // Calcular el ganador
-        const anguloNormalizado = (90 - (this.rotacionActual % 360) + 360) % 360;
+        // Calcular el ganador basado en la posición visual correcta
+        // El punto de referencia está en la parte superior (0 grados)
+        const anguloNormalizado = (360 - (this.rotacionActual % 360)) % 360;
         const anguloPorSegmento = 360 / this.opciones.length;
-        const indiceGanador = Math.floor(anguloNormalizado / anguloPorSegmento);
+        const indiceGanador = Math.floor(anguloNormalizado / anguloPorSegmento) % this.opciones.length;
         const ganador = this.opciones[indiceGanador];
+
+        console.log(`Debug: Ángulo: ${this.rotacionActual}, Normalizado: ${anguloNormalizado}, Índice: ${indiceGanador}, Ganador: ${ganador}`);
+
+        // Calcular ganancias
+        const ganancias = this.calcularGanancias(ganador);
 
         // Mostrar resultado con color apropiado
         const result = document.getElementById('result');
         let mensajeColor = '#FFD700'; // Dorado por defecto
+        let resultText = '';
         
         if (ganador === "0") {
             mensajeColor = '#00AA00'; // Verde
-            const greenText = window.i18n ? window.i18n.t('roulette.winner_green', ganador) : `🎉 ¡${ganador} - VERDE! 🎉`;
-            result.textContent = greenText;
+            resultText = window.i18n ? window.i18n.t('roulette.winner_green', ganador) : `🎉 ¡${ganador} - VERDE! 🎉`;
         } else {
             // Obtener el color basado en la posición del número ganador
             const colorGanador = this.colores[indiceGanador];
             if (colorGanador === '#DC143C') {
                 mensajeColor = '#DC143C'; // Rojo
-                const redText = window.i18n ? window.i18n.t('roulette.winner_red', ganador) : `🎉 ¡${ganador} - ROJO! 🎉`;
-                result.textContent = redText;
+                resultText = window.i18n ? window.i18n.t('roulette.winner_red', ganador) : `🎉 ¡${ganador} - ROJO! 🎉`;
             } else {
                 mensajeColor = '#1A1A1A'; // Negro
-                const blackText = window.i18n ? window.i18n.t('roulette.winner_black', ganador) : `🎉 ¡${ganador} - NEGRO! 🎉`;
-                result.textContent = blackText;
+                resultText = window.i18n ? window.i18n.t('roulette.winner_black', ganador) : `🎉 ¡${ganador} - NEGRO! 🎉`;
             }
         }
+
+        // Agregar información de ganancias al resultado
+        if (ganancias > 0) {
+            resultText += ` 💰 Ganaste: ${ganancias}`;
+        }
+
+        result.textContent = resultText;
         
         result.style.color = mensajeColor;
         result.classList.add('winner-animation');
@@ -394,6 +411,9 @@ class Ruleta {
 
         // Guardar resultado en la API
         this.guardarResultado(ganador, this.colores[indiceGanador]);
+
+        // Calcular y mostrar ganancias
+        this.calcularGanancias(ganador);
 
         // Resetear botón
         this.girando = false;
@@ -501,6 +521,297 @@ class Ruleta {
     // Método para obtener todas las opciones
     obtenerOpciones() {
         return [...this.opciones];
+    }
+
+    buildBettingBoard() {
+        const bettingBoard = document.getElementById('betting_board');
+        if (!bettingBoard) return;
+
+        bettingBoard.innerHTML = '';
+
+        // Crear sección de fichas
+        this.createChipSection(bettingBoard);
+
+        // Crear información de apuestas
+        this.createBetInfo(bettingBoard);
+
+        // Crear tablero de números
+        this.createNumberBoard(bettingBoard);
+
+        // Crear apuestas exteriores
+        this.createOutsideBets(bettingBoard);
+
+        // Crear controles
+        this.createBettingControls(bettingBoard);
+    }
+
+    createChipSection(container) {
+        const chipSection = document.createElement('div');
+        chipSection.className = 'chip-section';
+
+        const chipValues = [1, 5, 10, 25, 100];
+        chipValues.forEach(value => {
+            const chip = document.createElement('div');
+            chip.className = `chip chip-${value} ${value === this.selectedChip ? 'active' : ''}`;
+            chip.textContent = value;
+            chip.onclick = () => this.selectChip(value);
+            chipSection.appendChild(chip);
+        });
+
+        container.appendChild(chipSection);
+    }
+
+    createBetInfo(container) {
+        const betInfo = document.createElement('div');
+        betInfo.className = 'bet-info';
+
+        betInfo.innerHTML = `
+            <div class="bet-info-item">
+                <span class="bet-info-label">Banco</span>
+                <span class="bet-info-value" id="bank-value">${this.bankValue}</span>
+            </div>
+            <div class="bet-info-item">
+                <span class="bet-info-label">Apuesta Total</span>
+                <span class="bet-info-value" id="total-bet">${this.currentBet}</span>
+            </div>
+            <div class="bet-info-item">
+                <span class="bet-info-label">Ficha Seleccionada</span>
+                <span class="bet-info-value" id="selected-chip">${this.selectedChip}</span>
+            </div>
+        `;
+
+        container.appendChild(betInfo);
+    }
+
+    createNumberBoard(container) {
+        const numberBoard = document.createElement('div');
+        numberBoard.className = 'number-board';
+
+        // Crear casilla del 0
+        const zero = document.createElement('div');
+        zero.className = 'number-block number-0 green';
+        zero.textContent = '0';
+        zero.onclick = () => this.placeBet('0', 'straight', 35);
+        numberBoard.appendChild(zero);
+
+        // Crear filas de números
+        for (let row = 0; row < 3; row++) {
+            for (let col = 1; col <= 12; col++) {
+                const number = (row * 12) + col + (2 - row);
+                if (number <= 36) {
+                    const numberBlock = document.createElement('div');
+                    numberBlock.className = `number-block ${this.getNumberClass(number)}`;
+                    numberBlock.textContent = number;
+                    numberBlock.onclick = () => this.placeBet(number.toString(), 'straight', 35);
+                    numberBoard.appendChild(numberBlock);
+                }
+            }
+
+            // Agregar apuesta de columna
+            const columnBet = document.createElement('div');
+            columnBet.className = 'number-block column-bet';
+            columnBet.textContent = '2:1';
+            const columnNumbers = this.getColumnNumbers(row);
+            columnBet.onclick = () => this.placeBet(columnNumbers, 'column', 2);
+            numberBoard.appendChild(columnBet);
+        }
+
+        container.appendChild(numberBoard);
+    }
+
+    createOutsideBets(container) {
+        const outsideBets = document.createElement('div');
+        outsideBets.className = 'outside-bets';
+
+        const bets = [
+            { label: '1-18', numbers: this.getRange(1, 18), type: 'low', odds: 1 },
+            { label: 'PAR', numbers: this.getEvenNumbers(), type: 'even', odds: 1 },
+            { label: 'ROJO', numbers: this.numRed, type: 'red', odds: 1, class: 'red-bet' },
+            { label: 'NEGRO', numbers: this.getBlackNumbers(), type: 'black', odds: 1, class: 'black-bet' },
+            { label: 'IMPAR', numbers: this.getOddNumbers(), type: 'odd', odds: 1 },
+            { label: '19-36', numbers: this.getRange(19, 36), type: 'high', odds: 1 }
+        ];
+
+        bets.forEach(bet => {
+            const betElement = document.createElement('div');
+            betElement.className = `outside-bet ${bet.class || ''}`;
+            betElement.textContent = bet.label;
+            betElement.onclick = () => this.placeBet(bet.numbers, bet.type, bet.odds);
+            outsideBets.appendChild(betElement);
+        });
+
+        // Agregar apuestas de docenas
+        const dozens = [
+            { label: '1-12', numbers: this.getRange(1, 12) },
+            { label: '13-24', numbers: this.getRange(13, 24) },
+            { label: '25-36', numbers: this.getRange(25, 36) }
+        ];
+
+        dozens.forEach(dozen => {
+            const dozenElement = document.createElement('div');
+            dozenElement.className = 'outside-bet';
+            dozenElement.textContent = dozen.label;
+            dozenElement.onclick = () => this.placeBet(dozen.numbers, 'dozen', 2);
+            outsideBets.appendChild(dozenElement);
+        });
+
+        container.appendChild(outsideBets);
+    }
+
+    createBettingControls(container) {
+        const controls = document.createElement('div');
+        controls.className = 'betting-controls';
+
+        const clearButton = document.createElement('button');
+        clearButton.className = 'clear-bets-btn';
+        clearButton.textContent = 'Limpiar Apuestas';
+        clearButton.onclick = () => this.clearAllBets();
+
+        controls.appendChild(clearButton);
+        container.appendChild(controls);
+    }
+
+    // Métodos auxiliares para el sistema de apuestas
+    selectChip(value) {
+        this.selectedChip = value;
+        // Actualizar visualización de fichas
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.classList.remove('active');
+        });
+        document.querySelector(`.chip-${value}`).classList.add('active');
+        document.getElementById('selected-chip').textContent = value;
+    }
+
+    placeBet(numbers, type, odds) {
+        if (this.girando || this.selectedChip > this.bankValue) return;
+
+        const betAmount = Math.min(this.selectedChip, this.bankValue);
+        if (betAmount <= 0) return;
+
+        // Crear o actualizar apuesta
+        const existingBet = this.bets.find(bet => 
+            bet.type === type && this.arraysEqual(bet.numbers, numbers)
+        );
+
+        if (existingBet) {
+            existingBet.amount += betAmount;
+        } else {
+            this.bets.push({
+                numbers: Array.isArray(numbers) ? numbers : [parseInt(numbers)],
+                type,
+                odds,
+                amount: betAmount
+            });
+        }
+
+        this.bankValue -= betAmount;
+        this.currentBet += betAmount;
+        this.updateBetInfo();
+        this.showPlacedChips();
+    }
+
+    clearAllBets() {
+        this.bankValue += this.currentBet;
+        this.currentBet = 0;
+        this.bets = [];
+        this.updateBetInfo();
+        this.removePlacedChips();
+    }
+
+    updateBetInfo() {
+        document.getElementById('bank-value').textContent = this.bankValue;
+        document.getElementById('total-bet').textContent = this.currentBet;
+    }
+
+    showPlacedChips() {
+        this.removePlacedChips();
+        // Aquí se mostrarían las fichas en el tablero
+        // Se implementaría la lógica visual de las fichas colocadas
+    }
+
+    removePlacedChips() {
+        document.querySelectorAll('.placed-chip').forEach(chip => chip.remove());
+    }
+
+    // Métodos utilitarios
+    getNumberClass(number) {
+        if (number === 0) return 'green';
+        return this.numRed.includes(number) ? 'red' : 'black';
+    }
+
+    getColumnNumbers(row) {
+        const numbers = [];
+        for (let i = 3 - row; i <= 36; i += 3) {
+            numbers.push(i);
+        }
+        return numbers;
+    }
+
+    getRange(start, end) {
+        const range = [];
+        for (let i = start; i <= end; i++) {
+            range.push(i);
+        }
+        return range;
+    }
+
+    getEvenNumbers() {
+        const evens = [];
+        for (let i = 2; i <= 36; i += 2) {
+            evens.push(i);
+        }
+        return evens;
+    }
+
+    getOddNumbers() {
+        const odds = [];
+        for (let i = 1; i <= 36; i += 2) {
+            odds.push(i);
+        }
+        return odds;
+    }
+
+    getBlackNumbers() {
+        const blacks = [];
+        for (let i = 1; i <= 36; i++) {
+            if (!this.numRed.includes(i)) {
+                blacks.push(i);
+            }
+        }
+        return blacks;
+    }
+
+    arraysEqual(a, b) {
+        if (!Array.isArray(a) || !Array.isArray(b)) return false;
+        if (a.length !== b.length) return false;
+        return a.every((val, index) => val === b[index]);
+    }
+
+    // Modificar el método completarGiro para incluir cálculo de ganancias
+    calcularGanancias(numeroGanador) {
+        let totalWin = 0;
+        let winningBets = [];
+
+        this.bets.forEach(bet => {
+            if (bet.numbers.includes(parseInt(numeroGanador))) {
+                const winAmount = bet.amount * bet.odds;
+                totalWin += winAmount + bet.amount; // Incluye la apuesta original
+                winningBets.push({ ...bet, winAmount });
+            }
+        });
+
+        if (totalWin > 0) {
+            this.bankValue += totalWin;
+            console.log(`🎉 ¡Ganaste ${totalWin}! Apuestas ganadoras:`, winningBets);
+        }
+
+        // Limpiar apuestas después del giro
+        this.currentBet = 0;
+        this.bets = [];
+        this.updateBetInfo();
+        this.removePlacedChips();
+
+        return totalWin;
     }
 }
 

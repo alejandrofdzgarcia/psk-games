@@ -50,5 +50,17 @@
     "footer.version": "Versión 2.0 - Actualizado el 27/06/2025",
     "footer.privacy": "Privacidad",
     "footer.terms": "Términos",
-    "footer.contact": "Contacto"
+    "footer.contact": "Contacto",
+    
+    "roulette.betting_table": "Mesa de Apuestas",
+    "roulette.bank": "Banco",
+    "roulette.total_bet": "Apuesta Total",
+    "roulette.selected_chip": "Ficha Seleccionada",
+    "roulette.clear_bets": "Limpiar Apuestas",
+    "roulette.even": "PAR",
+    "roulette.odd": "IMPAR",
+    "roulette.red": "ROJO",
+    "roulette.black": "NEGRO",
+    "roulette.low": "1-18",
+    "roulette.high": "19-36"
 }

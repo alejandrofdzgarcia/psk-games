@@ -245,6 +245,249 @@ html, body {
     justify-content: center;
 }
 
+/* Estilos para el tablero de apuestas */
+.betting-container {
+    margin: 40px auto;
+    max-width: 1200px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    border: 2px solid #DAA520;
+}
+
+.betting-container h3 {
+    color: #DAA520;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.betting-board {
+    background: #016D29;
+    border: 2px solid #DAA520;
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Tablero de números */
+.number-board {
+    display: grid;
+    grid-template-columns: auto repeat(12, 1fr) auto;
+    gap: 2px;
+    margin-bottom: 15px;
+}
+
+.number-block {
+    background: #000;
+    color: white;
+    border: 2px solid #DAA520;
+    padding: 15px 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.number-block:hover {
+    background: #333;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+}
+
+.number-block.red {
+    background: #DC143C;
+}
+
+.number-block.black {
+    background: #000;
+}
+
+.number-block.green {
+    background: #00AA00;
+}
+
+.number-0 {
+    grid-row: span 3;
+    writing-mode: vertical-rl;
+    background: #00AA00 !important;
+    font-size: 20px;
+    padding: 20px 8px;
+}
+
+.column-bet {
+    background: #016D29;
+    color: #DAA520;
+    font-size: 14px;
+    padding: 10px;
+    border: 2px solid #DAA520;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.column-bet:hover {
+    background: #0A8A3A;
+    transform: scale(1.05);
+}
+
+/* Apuestas exteriores */
+.outside-bets {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.outside-bet {
+    background: #016D29;
+    color: white;
+    border: 2px solid #DAA520;
+    padding: 20px 10px;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.outside-bet:hover {
+    background: #0A8A3A;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+}
+
+.outside-bet.red-bet {
+    background: #DC143C;
+}
+
+.outside-bet.black-bet {
+    background: #000;
+}
+
+/* Sección de fichas */
+.chip-section {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.chip {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 4px solid;
+    background: white;
+    color: #000;
+    position: relative;
+}
+
+.chip:hover {
+    transform: scale(1.1);
+}
+
+.chip.active {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.chip-1 { border-color: #DC143C; }
+.chip-5 { border-color: #0066CC; }
+.chip-10 { border-color: #FF8C00; }
+.chip-25 { border-color: #00AA00; }
+.chip-100 { border-color: #800080; }
+
+/* Información de la apuesta */
+.bet-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    border: 1px solid #DAA520;
+}
+
+.bet-info-item {
+    text-align: center;
+    color: white;
+}
+
+.bet-info-label {
+    display: block;
+    font-size: 14px;
+    color: #DAA520;
+    margin-bottom: 5px;
+}
+
+.bet-info-value {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Fichas colocadas en el tablero */
+.placed-chip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Botones de control */
+.betting-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.clear-bets-btn {
+    background: #DC143C;
+    color: white;
+    border: 2px solid #8B0000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.clear-bets-btn:hover {
+    background: #B22222;
+    transform: scale(1.05);
+}
+
 /* Media Queries para Ruleta */
 
 /* Móviles pequeños (320px - 480px) */
