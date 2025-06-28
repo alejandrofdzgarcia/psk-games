@@ -707,7 +707,11 @@ class Ruleta {
         this.bankValue -= betAmount;
         this.currentBet += betAmount;
         this.updateBetInfo();
-        this.showPlacedChips();
+        
+        // Mostrar fichas después de un breve delay para una mejor experiencia visual
+        setTimeout(() => {
+            this.showPlacedChips();
+        }, 50);
     }
 
     clearAllBets() {
@@ -725,8 +729,159 @@ class Ruleta {
 
     showPlacedChips() {
         this.removePlacedChips();
-        // Aquí se mostrarían las fichas en el tablero
-        // Se implementaría la lógica visual de las fichas colocadas
+        
+        // Agrupar apuestas por elemento objetivo
+        const chipsByElement = new Map();
+        
+        this.bets.forEach((bet, betIndex) => {
+            const targetElement = this.findTargetElement(bet);
+            if (targetElement) {
+                if (!chipsByElement.has(targetElement)) {
+                    chipsByElement.set(targetElement, []);
+                }
+                chipsByElement.get(targetElement).push(bet);
+            }
+        });
+
+        // Crear fichas para cada elemento
+        chipsByElement.forEach((bets, targetElement) => {
+            this.createChipsForElement(targetElement, bets);
+        });
+    }
+
+    createChipsForElement(targetElement, bets) {
+        targetElement.style.position = 'relative';
+        
+        // Calcular el total de fichas y su valor
+        const totalAmount = bets.reduce((sum, bet) => sum + bet.amount, 0);
+        const chipCount = bets.length;
+        
+        // Crear un contenedor para las fichas
+        const chipContainer = document.createElement('div');
+        chipContainer.className = 'chip-container placed-chip';
+        chipContainer.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+        `;
+
+        if (chipCount === 1) {
+            // Una sola ficha
+            const chip = this.createSingleChip(bets[0]);
+            chipContainer.appendChild(chip);
+        } else {
+            // Múltiples fichas - crear stack
+            this.createChipStack(chipContainer, bets, totalAmount);
+        }
+
+        targetElement.appendChild(chipContainer);
+    }
+
+    createSingleChip(bet) {
+        const chip = document.createElement('div');
+        chip.className = 'placed-chip-element';
+        
+        // Obtener color de la ficha basado en el valor
+        const chipColor = this.getChipColor(bet.amount);
+        
+        chip.style.cssText = `
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: ${chipColor.gradient};
+            border: 2px solid ${chipColor.border};
+            color: ${chipColor.text};
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+        `;
+        chip.textContent = bet.amount;
+        return chip;
+    }
+
+    getChipColor(amount) {
+        // Colores de fichas basados en valores de casino real
+        if (amount >= 100) {
+            return {
+                gradient: 'linear-gradient(145deg, #800080, #4B0082)',
+                border: '#4B0080',
+                text: '#FFF'
+            };
+        } else if (amount >= 25) {
+            return {
+                gradient: 'linear-gradient(145deg, #00AA00, #006600)',
+                border: '#004400',
+                text: '#FFF'
+            };
+        } else if (amount >= 10) {
+            return {
+                gradient: 'linear-gradient(145deg, #FF8C00, #FF4500)',
+                border: '#CC3300',
+                text: '#FFF'
+            };
+        } else if (amount >= 5) {
+            return {
+                gradient: 'linear-gradient(145deg, #0066CC, #004499)',
+                border: '#002266',
+                text: '#FFF'
+            };
+        } else {
+            return {
+                gradient: 'linear-gradient(145deg, #DC143C, #8B0000)',
+                border: '#660000',
+                text: '#FFF'
+            };
+        }
+    }
+
+    createChipStack(container, bets, totalAmount) {
+        // Crear fichas apiladas con efecto 3D
+        bets.forEach((bet, index) => {
+            const chip = document.createElement('div');
+            chip.className = 'placed-chip-element';
+            
+            // Obtener color de la ficha
+            const chipColor = this.getChipColor(bet.amount);
+            
+            chip.style.cssText = `
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background: ${chipColor.gradient};
+                border: 2px solid ${chipColor.border};
+                color: ${chipColor.text};
+                font-size: 8px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                position: absolute;
+                top: ${index * -2}px;
+                left: ${index * -1}px;
+                z-index: ${10 + index};
+            `;
+            
+            // Mostrar valor individual en cada ficha, o total en la superior
+            if (index === bets.length - 1 && bets.length > 2) {
+                chip.textContent = totalAmount; // Mostrar total en la ficha superior
+                // Color especial para la ficha superior cuando hay múltiples apuestas
+                chip.style.background = 'linear-gradient(145deg, #FFD700, #FFA500)';
+                chip.style.borderColor = '#B8860B';
+                chip.style.color = '#000';
+            } else {
+                chip.textContent = bet.amount;
+            }
+            
+            container.appendChild(chip);
+        });
     }
 
     removePlacedChips() {
@@ -813,6 +968,109 @@ class Ruleta {
 
         return totalWin;
     }
+
+    // Métodos auxiliares para mostrar fichas
+
+    findTargetElement(bet) {
+        const bettingBoard = document.getElementById('betting_board');
+        if (!bettingBoard) return null;
+
+        switch (bet.type) {
+            case 'straight':
+                // Apuesta a un número específico
+                const number = bet.numbers[0];
+                const numberBlocks = bettingBoard.querySelectorAll('.number-block');
+                for (let block of numberBlocks) {
+                    if (block.textContent.trim() === number.toString()) {
+                        return block;
+                    }
+                }
+                return null;
+            
+            case 'red':
+                return this.findElementByText(bettingBoard, '.red-bet, .outside-bet', 'ROJO');
+            
+            case 'black':
+                return this.findElementByText(bettingBoard, '.black-bet, .outside-bet', 'NEGRO');
+            
+            case 'even':
+                return this.findElementByText(bettingBoard, '.outside-bet', 'PAR');
+            
+            case 'odd':
+                return this.findElementByText(bettingBoard, '.outside-bet', 'IMPAR');
+            
+            case 'low':
+                return this.findElementByText(bettingBoard, '.outside-bet', '1-18');
+            
+            case 'high':
+                return this.findElementByText(bettingBoard, '.outside-bet', '19-36');
+            
+            case 'dozen':
+                const firstNumber = bet.numbers[0];
+                if (firstNumber <= 12) {
+                    return this.findElementByText(bettingBoard, '.outside-bet', '1-12');
+                } else if (firstNumber <= 24) {
+                    return this.findElementByText(bettingBoard, '.outside-bet', '13-24');
+                } else {
+                    return this.findElementByText(bettingBoard, '.outside-bet', '25-36');
+                }
+            
+            case 'column':
+                const columnIndex = this.getColumnIndex(bet.numbers);
+                const columnBets = bettingBoard.querySelectorAll('.column-bet');
+                return columnBets[columnIndex] || null;
+            
+            default:
+                return null;
+        }
+    }
+
+    findElementByText(container, selector, text) {
+        const elements = container.querySelectorAll(selector);
+        for (let element of elements) {
+            if (element.textContent.trim() === text) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    positionChipOnElement(chipElement, targetElement, betIndex) {
+        targetElement.style.position = 'relative';
+        
+        // Calcular posición para evitar superposiciones
+        const existingChips = targetElement.querySelectorAll('.placed-chip').length;
+        const offset = existingChips * 3; // Desplazamiento incremental
+        
+        // Posicionar la ficha
+        chipElement.style.top = `${5 + offset}px`;
+        chipElement.style.right = `${5 + offset}px`;
+        
+        // Si hay muchas fichas, usar una estrategia en espiral
+        if (existingChips >= 3) {
+            const angle = (existingChips - 3) * 60; // 60 grados entre fichas
+            const radius = 15;
+            const centerX = targetElement.offsetWidth / 2;
+            const centerY = targetElement.offsetHeight / 2;
+            
+            const x = centerX + Math.cos(angle * Math.PI / 180) * radius;
+            const y = centerY + Math.sin(angle * Math.PI / 180) * radius;
+            
+            chipElement.style.top = `${y - 10}px`;
+            chipElement.style.left = `${x - 10}px`;
+            chipElement.style.right = 'auto';
+        }
+    }
+
+    getColumnIndex(numbers) {
+        // Determinar qué columna basándose en los números
+        const firstNumber = numbers[0];
+        if (firstNumber % 3 === 1) return 0; // Primera columna
+        if (firstNumber % 3 === 2) return 1; // Segunda columna
+        return 2; // Tercera columna
+    }
+
+    // ...existing code...
 }
 
 // Inicializar la ruleta cuando se carga la página
