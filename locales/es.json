@@ -68,5 +68,31 @@
     "roulette.red": "ROJO",
     "roulette.black": "NEGRO",
     "roulette.low": "1-18",
-    "roulette.high": "19-36"
+    "roulette.high": "19-36",
+    
+    "simon": {
+        "page_title": "Simon Dice - PSK Games",
+        "title": "Simon Dice",
+        "description": "Memoriza y repite la secuencia de colores",
+        "level": "Nivel",
+        "score": "Puntuación",
+        "best": "Mejor",
+        "start": "Iniciar Juego",
+        "reset": "Reiniciar",
+        "settings": "Configuración",
+        "settings_title": "Configuración",
+        "difficulty": "Dificultad",
+        "easy": "Fácil",
+        "normal": "Normal",
+        "hard": "Difícil",
+        "sound": "Sonido",
+        "speed": "Velocidad",
+        "high_scores": "Mejores Puntuaciones",
+        "starting": "Comenzando...",
+        "watch": "Observa la secuencia...",
+        "your_turn": "Tu turno...",
+        "correct": "¡Correcto!",
+        "game_over": "¡Juego terminado! Llegaste al nivel {level}",
+        "new_record": "¡Nueva mejor puntuación!"
+    }
 }

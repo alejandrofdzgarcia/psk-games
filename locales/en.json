@@ -62,5 +62,31 @@
     "roulette.red": "RED",
     "roulette.black": "BLACK",
     "roulette.low": "1-18",
-    "roulette.high": "19-36"
+    "roulette.high": "19-36",
+    
+    "simon": {
+        "page_title": "Simon Says - PSK Games",
+        "title": "Simon Says",
+        "description": "Memorize and repeat the color sequence",
+        "level": "Level",
+        "score": "Score",
+        "best": "Best",
+        "start": "Start Game",
+        "reset": "Reset",
+        "settings": "Settings",
+        "settings_title": "Settings",
+        "difficulty": "Difficulty",
+        "easy": "Easy",
+        "normal": "Normal",
+        "hard": "Hard",
+        "sound": "Sound",
+        "speed": "Speed",
+        "high_scores": "High Scores",
+        "starting": "Starting...",
+        "watch": "Watch the sequence...",
+        "your_turn": "Your turn...",
+        "correct": "Correct!",
+        "game_over": "Game over! You reached level {level}",
+        "new_record": "New high score!"
+    }
 }

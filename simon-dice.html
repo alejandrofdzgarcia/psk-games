@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title data-i18n="simon.page_title">Simon Dice - PSK Games</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
+    <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="estilos/simon-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/i18n.js"></script>
+    <script src="js/api-client.js"></script>
+</head>
+<body>
+    <div class="navigation">
+        <button class="back-button" onclick="volverAlMenu()" data-i18n="nav.back">← Volver al Menú</button>
+    </div>
+
+    <div class="container">
+        <h1 data-i18n="simon.title">🧠 Simon Dice</h1>
+        <p class="subtitle" data-i18n="simon.description">Memoriza y repite la secuencia de colores</p>
+        
+        <!-- Indicador de estado de conexión -->
+        <div id="connection-status" class="connection-status">
+            <span id="status-icon">🔄</span>
+            <span id="status-text" data-i18n="status.connecting">Conectando...</span>
+        </div>
+
+        <!-- Panel de información del juego -->
+        <div class="game-info">
+            <div class="info-item">
+                <span data-i18n="simon.level">Nivel:</span>
+                <span id="level-display">1</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="simon.score">Puntuación:</span>
+                <span id="score-display">0</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="simon.best">Mejor:</span>
+                <span id="best-score">0</span>
+            </div>
+        </div>
+
+        <!-- Tablero de juego Simon Dice -->
+        <div class="simon-board">
+            <div class="simon-button" id="button-0" data-color="red" data-sound="1">
+                <div class="button-inner"></div>
+            </div>
+            <div class="simon-button" id="button-1" data-color="blue" data-sound="2">
+                <div class="button-inner"></div>
+            </div>
+            <div class="simon-button" id="button-2" data-color="green" data-sound="3">
+                <div class="button-inner"></div>
+            </div>
+            <div class="simon-button" id="button-3" data-color="yellow" data-sound="4">
+                <div class="button-inner"></div>
+            </div>
+            
+            <!-- Centro del tablero -->
+            <div class="simon-center">
+                <div class="center-logo">
+                    <i class="fas fa-brain"></i>
+                    <span>SIMON</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles del juego -->
+        <div class="game-controls">
+            <button class="control-button start-button" id="start-game" data-i18n="simon.start">Iniciar Juego</button>
+            <button class="control-button reset-button" id="reset-game" data-i18n="simon.reset">Reiniciar</button>
+            <button class="control-button settings-button" onclick="toggleSettings()" data-i18n="simon.settings">Configuración</button>
+        </div>
+
+        <!-- Panel de configuración -->
+        <div class="settings-panel" id="settings-panel">
+            <h3 data-i18n="simon.settings_title">Configuración</h3>
+            <div class="setting-item">
+                <label data-i18n="simon.difficulty">Dificultad:</label>
+                <select id="difficulty-select">
+                    <option value="easy" data-i18n="simon.easy">Fácil</option>
+                    <option value="normal" data-i18n="simon.normal" selected>Normal</option>
+                    <option value="hard" data-i18n="simon.hard">Difícil</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="simon.sound">Sonido:</label>
+                <input type="checkbox" id="sound-toggle" checked>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="simon.speed">Velocidad:</label>
+                <input type="range" id="speed-slider" min="1" max="5" value="3">
+            </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <div class="game-message" id="game-message"></div>
+
+        <!-- Panel de puntuaciones -->
+        <div class="scores-panel">
+            <h3 data-i18n="simon.high_scores">Mejores Puntuaciones</h3>
+            <div id="high-scores-list"></div>
+        </div>
+    </div>
+
+    <script src="js/menu.js"></script>
+    <script src="js/simon-dice.js"></script>
+    <script src="js/stats-manager.js"></script>
+</body>
+</html>
