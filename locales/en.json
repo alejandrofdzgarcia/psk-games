@@ -88,5 +88,30 @@
         "correct": "Correct!",
         "game_over": "Game over! You reached level {level}",
         "new_record": "New high score!"
+    },
+    "tateti": {
+        "title": "Tic Tac Toe",
+        "page_title": "Tic Tac Toe - PSK Games",
+        "description": "The classic three in a row game",
+        "current_player": "Turn",
+        "score_x": "X Score",
+        "score_o": "O Score",
+        "draws": "Draws", 
+        "restart": "New Game",
+        "reset_scores": "Reset Scores",
+        "settings": "Settings",
+        "settings_title": "Settings",
+        "game_mode": "Game Mode",
+        "player_vs_player": "Player vs Player",
+        "player_vs_computer": "Player vs Computer",
+        "difficulty": "AI Difficulty",
+        "easy": "Easy",
+        "medium": "Medium", 
+        "hard": "Hard",
+        "sound": "Sound",
+        "animations": "Animations",
+        "statistics": "Statistics",
+        "total_games": "Games Played",
+        "win_rate": "Win Rate"
     }
 }

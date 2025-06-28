@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title data-i18n="tateti.page_title">Tateti - PSK Games</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
+    <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="estilos/tateti.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/i18n.js"></script>
+    <script src="js/api-client.js"></script>
+</head>
+<body>
+    <div class="navigation">
+        <button class="back-button" onclick="volverAlMenu()" data-i18n="nav.back">← Volver al Menú</button>
+    </div>
+
+    <div class="container">
+        <h1 data-i18n="tateti.title">⚡ Tateti</h1>
+        <p class="subtitle" data-i18n="tateti.description">El clásico juego de tres en línea</p>
+        
+        <!-- Indicador de estado de conexión -->
+        <div id="connection-status" class="connection-status">
+            <span id="status-icon">🔄</span>
+            <span id="status-text" data-i18n="status.connecting">Conectando...</span>
+        </div>
+
+        <!-- Panel de información del juego -->
+        <div class="game-info">
+            <div class="info-item">
+                <span data-i18n="tateti.current_player">Turno:</span>
+                <span id="current-player">X</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="tateti.score_x">Puntos X:</span>
+                <span id="score-x">0</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="tateti.score_o">Puntos O:</span>
+                <span id="score-o">0</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="tateti.draws">Empates:</span>
+                <span id="draws">0</span>
+            </div>
+        </div>
+
+        <!-- Tablero de juego -->
+        <div class="tateti-board" id="tateti-board">
+            <div class="tateti-cell" data-index="0"></div>
+            <div class="tateti-cell" data-index="1"></div>
+            <div class="tateti-cell" data-index="2"></div>
+            <div class="tateti-cell" data-index="3"></div>
+            <div class="tateti-cell" data-index="4"></div>
+            <div class="tateti-cell" data-index="5"></div>
+            <div class="tateti-cell" data-index="6"></div>
+            <div class="tateti-cell" data-index="7"></div>
+            <div class="tateti-cell" data-index="8"></div>
+        </div>
+
+        <!-- Controles del juego -->
+        <div class="game-controls">
+            <button class="control-button restart-button" id="restart-game" data-i18n="tateti.restart">Nueva Partida</button>
+            <button class="control-button reset-button" id="reset-scores" data-i18n="tateti.reset_scores">Reiniciar Puntuación</button>
+            <button class="control-button settings-button" onclick="toggleSettings()" data-i18n="tateti.settings">Configuración</button>
+        </div>
+
+        <!-- Panel de configuración -->
+        <div class="settings-panel" id="settings-panel">
+            <h3 data-i18n="tateti.settings_title">Configuración</h3>
+            <div class="setting-item">
+                <label data-i18n="tateti.game_mode">Modo de juego:</label>
+                <select id="game-mode-select">
+                    <option value="pvp" data-i18n="tateti.player_vs_player" selected>Jugador vs Jugador</option>
+                    <option value="pvc" data-i18n="tateti.player_vs_computer">Jugador vs Computadora</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="tateti.difficulty">Dificultad IA:</label>
+                <select id="difficulty-select">
+                    <option value="easy" data-i18n="tateti.easy">Fácil</option>
+                    <option value="medium" data-i18n="tateti.medium" selected>Medio</option>
+                    <option value="hard" data-i18n="tateti.hard">Difícil</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="tateti.sound">Sonido:</label>
+                <input type="checkbox" id="sound-toggle" checked>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="tateti.animations">Animaciones:</label>
+                <input type="checkbox" id="animations-toggle" checked>
+            </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <div class="game-message" id="game-message"></div>
+
+        <!-- Panel de estadísticas -->
+        <div class="stats-panel">
+            <h3 data-i18n="tateti.statistics">Estadísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="total-games">0</span>
+                    <span class="stat-label" data-i18n="tateti.total_games">Partidas Jugadas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="win-rate">0%</span>
+                    <span class="stat-label" data-i18n="tateti.win_rate">Porcentaje de Victoria</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/menu.js"></script>
+    <script src="js/tateti.js"></script>
+</body>
+</html>

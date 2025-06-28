@@ -94,5 +94,30 @@
         "correct": "¡Correcto!",
         "game_over": "¡Juego terminado! Llegaste al nivel {level}",
         "new_record": "¡Nueva mejor puntuación!"
+    },
+    "tateti": {
+        "title": "Tateti",
+        "page_title": "Tateti - PSK Games",
+        "description": "El clásico juego de tres en línea",
+        "current_player": "Turno",
+        "score_x": "Puntos X",
+        "score_o": "Puntos O", 
+        "draws": "Empates",
+        "restart": "Nueva Partida",
+        "reset_scores": "Reiniciar Puntuación",
+        "settings": "Configuración",
+        "settings_title": "Configuración",
+        "game_mode": "Modo de juego",
+        "player_vs_player": "Jugador vs Jugador",
+        "player_vs_computer": "Jugador vs Computadora",
+        "difficulty": "Dificultad IA",
+        "easy": "Fácil",
+        "medium": "Medio",
+        "hard": "Difícil",
+        "sound": "Sonido",
+        "animations": "Animaciones",
+        "statistics": "Estadísticas",
+        "total_games": "Partidas Jugadas",
+        "win_rate": "Porcentaje de Victoria"
     }
 }
