@@ -1,20 +1,36 @@
+/**
+ * Juego de Ahorcado - Versión Optimizada
+ * Características: Múltiples categorías, dificultades, sonidos, estadísticas
+ */
 class Ahorcado {
     constructor() {
+        this.initializeProperties();
+        this.initializeGame();
+        this.loadUserData();
+    }
+
+    // Inicialización de propiedades del juego
+    initializeProperties() {
+        // Estado del juego
         this.currentWord = '';
         this.guessedWord = '';
         this.guessedLetters = [];
         this.wrongGuesses = 0;
         this.maxWrongGuesses = 6;
-        this.score = 0;
-        this.level = 1;
         this.gameActive = false;
         this.hintUsed = false;
+
+        // Progreso y puntuación
+        this.score = 0;
+        this.level = 1;
+        this.hintsAvailable = 3;
+
+        // Configuración
         this.currentCategory = 'animals';
         this.difficulty = 'medium';
         this.soundEnabled = true;
         this.animationsEnabled = true;
-        this.hintsAvailable = 3;
-        
+
         // Estadísticas
         this.stats = {
             wordsGuessed: 0,
@@ -23,9 +39,14 @@ class Ahorcado {
             currentStreak: 0,
             bestStreak: 0
         };
-        
-        // Palabras por categoría y dificultad
-        this.words = {
+
+        // Base de datos de palabras
+        this.words = this.initializeWordDatabase();
+    }
+
+    // Base de datos de palabras organizadas por categoría y dificultad
+    initializeWordDatabase() {
+        return {
             animals: {
                 easy: [
                     { word: 'PERRO', hint: 'Mejor amigo del hombre' },
@@ -142,54 +163,53 @@ class Ahorcado {
                 ]
             }
         };
-        
-        this.initializeGame();
-        this.loadStats();
-        this.loadSettings();
     }
-    
+
+    // Inicialización del juego
     initializeGame() {
-        this.canvas = document.getElementById('hangman-canvas');
-        this.ctx = this.canvas.getContext('2d');
-        
+        this.setupCanvas();
         this.setupEventListeners();
         this.createKeyboard();
         this.updateDisplay();
         this.updateConnectionStatus();
         this.showMessage('¡Presiona "Nueva Palabra" para comenzar!', 'info');
-        
-        // Registrar actividad en API
-        if (window.apiClient) {
-            window.apiClient.updateActivity('ahorcado');
-        }
+        this.registerActivity();
     }
-    
+
+    // Configuración del canvas para el dibujo del ahorcado
+    setupCanvas() {
+        this.canvas = document.getElementById('hangman-canvas');
+        this.ctx = this.canvas.getContext('2d');
+    }
+
+    // Configuración de todos los event listeners
     setupEventListeners() {
+        // Botones principales
         document.getElementById('start-game').addEventListener('click', () => this.startNewGame());
         document.getElementById('get-hint').addEventListener('click', () => this.showHint());
         document.getElementById('reset-game').addEventListener('click', () => this.resetGame());
-        
+
         // Configuración
         document.getElementById('difficulty-select').addEventListener('change', (e) => {
             this.difficulty = e.target.value;
             this.saveSettings();
         });
-        
+
         document.getElementById('category-select').addEventListener('change', (e) => {
             this.currentCategory = e.target.value;
             this.saveSettings();
         });
-        
+
         document.getElementById('sound-toggle').addEventListener('change', (e) => {
             this.soundEnabled = e.target.checked;
             this.saveSettings();
         });
-        
+
         document.getElementById('animations-toggle').addEventListener('change', (e) => {
             this.animationsEnabled = e.target.checked;
             this.saveSettings();
         });
-        
+
         // Teclado físico
         document.addEventListener('keydown', (e) => {
             if (this.gameActive && /^[A-Za-z]$/.test(e.key)) {
@@ -197,13 +217,14 @@ class Ahorcado {
             }
         });
     }
-    
+
+    // Crear teclado virtual
     createKeyboard() {
         const keyboard = document.getElementById('keyboard');
         const letters = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
-        
+
         keyboard.innerHTML = '';
-        
+
         for (let letter of letters) {
             const key = document.createElement('button');
             key.className = 'key';
@@ -212,46 +233,48 @@ class Ahorcado {
             keyboard.appendChild(key);
         }
     }
-    
+
+    // === MÉTODOS DE JUEGO ===
+
+    // Iniciar nuevo juego
     startNewGame() {
-        this.resetKeyboard();
+        this.resetGameState();
         this.selectRandomWord();
-        this.guessedLetters = [];
-        this.wrongGuesses = 0;
-        this.gameActive = true;
-        this.hintUsed = false;
-        
         this.initializeGuessedWord();
         this.updateDisplay();
         this.drawHangman();
         this.showMessage('¡Adivina la palabra!', 'info');
-        
-        document.getElementById('get-hint').disabled = false;
-        
-        // Registrar inicio de juego en API
         this.recordGameStart();
     }
-    
+
+    // Resetear estado del juego
+    resetGameState() {
+        this.resetKeyboard();
+        this.guessedLetters = [];
+        this.wrongGuesses = 0;
+        this.gameActive = true;
+        this.hintUsed = false;
+        document.getElementById('get-hint').disabled = false;
+    }
+
+    // Seleccionar palabra aleatoria
     selectRandomWord() {
-        let categories = [];
-        
-        if (this.currentCategory === 'all') {
-            categories = Object.keys(this.words);
-        } else {
-            categories = [this.currentCategory];
-        }
-        
+        const categories = this.currentCategory === 'all' 
+            ? Object.keys(this.words) 
+            : [this.currentCategory];
+
         const randomCategory = categories[Math.floor(Math.random() * categories.length)];
         const categoryWords = this.words[randomCategory][this.difficulty];
         const wordData = categoryWords[Math.floor(Math.random() * categoryWords.length)];
-        
+
         this.currentWord = wordData.word;
         this.currentHint = wordData.hint;
         this.currentWordCategory = randomCategory;
-        
+
         document.getElementById('current-category').textContent = this.getCategoryName(randomCategory);
     }
-    
+
+    // Obtener nombre de categoría en español
     getCategoryName(category) {
         const names = {
             animals: 'Animales',
@@ -262,19 +285,20 @@ class Ahorcado {
         };
         return names[category] || category;
     }
-    
+
+    // Inicializar palabra adivinada
     initializeGuessedWord() {
         this.guessedWord = this.currentWord.replace(/[A-ZÑÁÉÍÓÚÜ]/g, '_');
         this.displayWord();
     }
-    
+
+    // Mostrar palabra en pantalla
     displayWord() {
         const wordDisplay = document.getElementById('word-display');
         wordDisplay.innerHTML = '';
-        
-        for (let i = 0; i < this.currentWord.length; i++) {
+
+        for (let char of this.currentWord) {
             const letterBox = document.createElement('div');
-            const char = this.currentWord[i];
             
             if (char === ' ') {
                 letterBox.className = 'letter-box space';
@@ -289,158 +313,178 @@ class Ahorcado {
             wordDisplay.appendChild(letterBox);
         }
     }
-    
+
+    // Procesar letra adivinada
     guessLetter(letter) {
-        if (!this.gameActive || this.guessedLetters.includes(letter)) {
-            return;
-        }
-        
+        if (!this.gameActive || this.guessedLetters.includes(letter)) return;
+
         this.guessedLetters.push(letter);
-        
-        const keyElement = Array.from(document.querySelectorAll('.key'))
-            .find(key => key.textContent === letter);
-        
+        const keyElement = this.getKeyElement(letter);
+
         if (this.currentWord.includes(letter)) {
-            // Letra correcta
-            if (keyElement) {
-                keyElement.classList.add('correct');
-                keyElement.classList.add('disabled');
-            }
-            
-            this.updateGuessedWord();
-            this.displayWord();
-            
-            if (this.soundEnabled) {
-                this.playCorrectSound();
-            }
-            
-            // Verificar si ganó
-            if (!this.guessedWord.includes('_')) {
-                this.winGame();
-            }
+            this.handleCorrectGuess(keyElement);
         } else {
-            // Letra incorrecta
-            if (keyElement) {
-                keyElement.classList.add('incorrect');
-                keyElement.classList.add('disabled');
-            }
-            
-            this.wrongGuesses++;
-            this.drawHangman();
-            
-            if (this.soundEnabled) {
-                this.playIncorrectSound();
-            }
-            
-            if (this.animationsEnabled) {
-                this.shakeHangman();
-            }
-            
-            // Verificar si perdió
-            if (this.wrongGuesses >= this.maxWrongGuesses) {
-                this.loseGame();
-            }
+            this.handleIncorrectGuess(keyElement);
         }
-        
+
         this.updateDisplay();
     }
-    
-    updateGuessedWord() {
-        let newGuessedWord = '';
-        for (let i = 0; i < this.currentWord.length; i++) {
-            const char = this.currentWord[i];
-            if (char === ' ' || this.guessedLetters.includes(char)) {
-                newGuessedWord += char;
-            } else {
-                newGuessedWord += '_';
-            }
-        }
-        this.guessedWord = newGuessedWord;
+
+    // Obtener elemento de tecla
+    getKeyElement(letter) {
+        return Array.from(document.querySelectorAll('.key'))
+            .find(key => key.textContent === letter);
     }
-    
-    showHint() {
-        if (this.hintUsed || !this.gameActive || this.hintsAvailable <= 0) {
-            return;
+
+    // Manejar letra correcta
+    handleCorrectGuess(keyElement) {
+        if (keyElement) {
+            keyElement.classList.add('correct', 'disabled');
         }
-        
+
+        this.updateGuessedWord();
+        this.displayWord();
+
+        if (this.soundEnabled) this.playCorrectSound();
+
+        if (!this.guessedWord.includes('_')) {
+            this.winGame();
+        }
+    }
+
+    // Manejar letra incorrecta
+    handleIncorrectGuess(keyElement) {
+        if (keyElement) {
+            keyElement.classList.add('incorrect', 'disabled');
+        }
+
+        this.wrongGuesses++;
+        this.drawHangman();
+
+        if (this.soundEnabled) this.playIncorrectSound();
+        if (this.animationsEnabled) this.shakeHangman();
+
+        if (this.wrongGuesses >= this.maxWrongGuesses) {
+            this.loseGame();
+        }
+    }
+
+    // Actualizar palabra adivinada
+    updateGuessedWord() {
+        this.guessedWord = this.currentWord
+            .split('')
+            .map(char => (char === ' ' || this.guessedLetters.includes(char)) ? char : '_')
+            .join('');
+    }
+
+    // Mostrar pista
+    showHint() {
+        if (this.hintUsed || !this.gameActive || this.hintsAvailable <= 0) return;
+
         this.hintUsed = true;
         this.hintsAvailable--;
         this.score = Math.max(0, this.score - 10);
-        
+
         document.getElementById('word-hint').textContent = `💡 ${this.currentHint}`;
         document.getElementById('get-hint').disabled = true;
-        
+
         this.updateDisplay();
         this.showMessage('Pista revelada (-10 puntos)', 'warning');
     }
-    
+
+    // === MÉTODOS DE FIN DE JUEGO ===
+
+    // Ganar juego
     winGame() {
         this.gameActive = false;
+        this.updateWinStats();
+        
+        const points = this.calculatePoints();
+        this.score += points;
+
+        this.checkBestScore(points);
+        this.levelUp();
+        
+        if (this.soundEnabled) this.playWinSound();
+        
+        this.updateDisplay();
+        this.saveStats();
+        this.recordGameResult(true);
+        this.scheduleNextGamePrompt();
+    }
+
+    // Actualizar estadísticas de victoria
+    updateWinStats() {
         this.stats.wordsGuessed++;
         this.stats.totalWords++;
         this.stats.currentStreak++;
-        
+
         if (this.stats.currentStreak > this.stats.bestStreak) {
             this.stats.bestStreak = this.stats.currentStreak;
         }
-        
-        // Calcular puntos
+    }
+
+    // Calcular puntos
+    calculatePoints() {
         let points = 50; // Puntos base
         points += (this.maxWrongGuesses - this.wrongGuesses) * 10; // Bonus por errores evitados
         points += this.level * 5; // Bonus por nivel
         if (!this.hintUsed) points += 20; // Bonus por no usar pista
-        
-        this.score += points;
-        
+        return points;
+    }
+
+    // Verificar mejor puntuación
+    checkBestScore(points) {
         if (this.score > this.stats.bestScore) {
             this.stats.bestScore = this.score;
             this.showMessage(`¡Nueva mejor puntuación! +${points} puntos`, 'success');
         } else {
             this.showMessage(`¡Correcto! +${points} puntos`, 'success');
         }
-        
-        if (this.soundEnabled) {
-            this.playWinSound();
-        }
-        
+    }
+
+    // Subir de nivel
+    levelUp() {
         this.level++;
         this.hintsAvailable = Math.min(5, this.hintsAvailable + 1);
-        
-        this.updateDisplay();
-        this.saveStats();
-        this.recordGameResult(true);
-        
-        // Sugerir nueva palabra después de 3 segundos
+    }
+
+    // Programar próximo juego
+    scheduleNextGamePrompt() {
         setTimeout(() => {
             if (!this.gameActive) {
                 this.showMessage('¡Presiona "Nueva Palabra" para continuar!', 'info');
             }
         }, 3000);
     }
-    
+
+    // Perder juego
     loseGame() {
         this.gameActive = false;
-        this.stats.totalWords++;
-        this.stats.currentStreak = 0;
-        
-        this.drawHangman(); // Completar el dibujo
+        this.updateLossStats();
+        this.drawHangman();
         this.revealWord();
         
         this.showMessage(`¡Perdiste! La palabra era: ${this.currentWord}`, 'error');
         
-        if (this.soundEnabled) {
-            this.playLoseSound();
-        }
+        if (this.soundEnabled) this.playLoseSound();
         
         this.updateDisplay();
         this.saveStats();
         this.recordGameResult(false);
     }
-    
+
+    // Actualizar estadísticas de derrota
+    updateLossStats() {
+        this.stats.totalWords++;
+        this.stats.currentStreak = 0;
+    }
+
+    // Revelar palabra completa
     revealWord() {
         const wordDisplay = document.getElementById('word-display');
         const letterBoxes = wordDisplay.querySelectorAll('.letter-box:not(.space)');
-        
+
         letterBoxes.forEach((box, index) => {
             const char = this.currentWord.replace(/ /g, '')[index];
             if (char && !this.guessedLetters.includes(char)) {
@@ -450,7 +494,127 @@ class Ahorcado {
             }
         });
     }
-    
+
+    // === MÉTODOS DE DIBUJO ===
+
+    // Dibujar ahorcado
+    drawHangman() {
+        this.clearCanvas();
+        
+        const ctx = this.ctx;
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+
+        const drawingSteps = [
+            () => this.drawBase(ctx),
+            () => this.drawPole(ctx),
+            () => this.drawHorizontalBeam(ctx),
+            () => this.drawNoose(ctx),
+            () => this.drawHead(ctx),
+            () => this.drawBodyAndLimbs(ctx)
+        ];
+
+        for (let i = 0; i < this.wrongGuesses; i++) {
+            if (drawingSteps[i]) drawingSteps[i]();
+        }
+    }
+
+    // Dibujar base
+    drawBase(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(50, 320);
+        ctx.lineTo(150, 320);
+        ctx.stroke();
+    }
+
+    // Dibujar poste vertical
+    drawPole(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(100, 320);
+        ctx.lineTo(100, 50);
+        ctx.stroke();
+    }
+
+    // Dibujar viga horizontal
+    drawHorizontalBeam(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(100, 50);
+        ctx.lineTo(200, 50);
+        ctx.stroke();
+    }
+
+    // Dibujar cuerda
+    drawNoose(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(200, 50);
+        ctx.lineTo(200, 80);
+        ctx.stroke();
+    }
+
+    // Dibujar cabeza
+    drawHead(ctx) {
+        ctx.strokeStyle = '#d32f2f';
+        ctx.lineWidth = 3;
+        
+        // Cabeza
+        ctx.beginPath();
+        ctx.arc(200, 100, 20, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Cara triste
+        ctx.lineWidth = 2;
+        this.drawSadFace(ctx);
+    }
+
+    // Dibujar cara triste
+    drawSadFace(ctx) {
+        // Ojos
+        ctx.beginPath();
+        ctx.moveTo(192, 95); ctx.lineTo(188, 99);
+        ctx.moveTo(188, 95); ctx.lineTo(192, 99);
+        ctx.moveTo(208, 95); ctx.lineTo(212, 99);
+        ctx.moveTo(212, 95); ctx.lineTo(208, 99);
+        ctx.stroke();
+
+        // Boca triste
+        ctx.beginPath();
+        ctx.arc(200, 110, 8, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.stroke();
+    }
+
+    // Dibujar cuerpo y extremidades
+    drawBodyAndLimbs(ctx) {
+        ctx.strokeStyle = '#d32f2f';
+        ctx.lineWidth = 4;
+
+        // Cuerpo
+        ctx.beginPath();
+        ctx.moveTo(200, 120);
+        ctx.lineTo(200, 220);
+        ctx.stroke();
+
+        // Brazos
+        ctx.beginPath();
+        ctx.moveTo(200, 150); ctx.lineTo(170, 180);
+        ctx.moveTo(200, 150); ctx.lineTo(230, 180);
+        ctx.stroke();
+
+        // Piernas
+        ctx.beginPath();
+        ctx.moveTo(200, 220); ctx.lineTo(170, 270);
+        ctx.moveTo(200, 220); ctx.lineTo(230, 270);
+        ctx.stroke();
+    }
+
+    // Limpiar canvas
+    clearCanvas() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    // === MÉTODOS DE INTERFAZ ===
+
+    // Reiniciar juego completo
     resetGame() {
         this.score = 0;
         this.level = 1;
@@ -461,209 +625,107 @@ class Ahorcado {
         this.guessedLetters = [];
         this.wrongGuesses = 0;
         this.hintUsed = false;
-        
+
         this.resetKeyboard();
         this.clearCanvas();
         document.getElementById('word-display').innerHTML = '';
         document.getElementById('word-hint').textContent = '';
         document.getElementById('get-hint').disabled = false;
-        
+
         this.updateDisplay();
         this.showMessage('¡Juego reiniciado! Presiona "Nueva Palabra" para comenzar', 'info');
     }
-    
+
+    // Reiniciar teclado
     resetKeyboard() {
         document.querySelectorAll('.key').forEach(key => {
             key.classList.remove('correct', 'incorrect', 'disabled');
         });
     }
-    
-    drawHangman() {
-        this.clearCanvas();
-        
-        const ctx = this.ctx;
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 4;
-        ctx.lineCap = 'round';
-        
-        // Base
-        if (this.wrongGuesses >= 1) {
-            ctx.beginPath();
-            ctx.moveTo(50, 320);
-            ctx.lineTo(150, 320);
-            ctx.stroke();
-        }
-        
-        // Poste vertical
-        if (this.wrongGuesses >= 2) {
-            ctx.beginPath();
-            ctx.moveTo(100, 320);
-            ctx.lineTo(100, 50);
-            ctx.stroke();
-        }
-        
-        // Poste horizontal
-        if (this.wrongGuesses >= 3) {
-            ctx.beginPath();
-            ctx.moveTo(100, 50);
-            ctx.lineTo(200, 50);
-            ctx.stroke();
-        }
-        
-        // Cuerda
-        if (this.wrongGuesses >= 4) {
-            ctx.beginPath();
-            ctx.moveTo(200, 50);
-            ctx.lineTo(200, 80);
-            ctx.stroke();
-        }
-        
-        // Cabeza
-        if (this.wrongGuesses >= 5) {
-            ctx.strokeStyle = '#d32f2f';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(200, 100, 20, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Cara triste
-            ctx.lineWidth = 2;
-            // Ojos
-            ctx.beginPath();
-            ctx.moveTo(192, 95);
-            ctx.lineTo(188, 99);
-            ctx.moveTo(188, 95);
-            ctx.lineTo(192, 99);
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(208, 95);
-            ctx.lineTo(212, 99);
-            ctx.moveTo(212, 95);
-            ctx.lineTo(208, 99);
-            ctx.stroke();
-            
-            // Boca triste
-            ctx.beginPath();
-            ctx.arc(200, 110, 8, 0.2 * Math.PI, 0.8 * Math.PI);
-            ctx.stroke();
-        }
-        
-        // Cuerpo
-        if (this.wrongGuesses >= 6) {
-            ctx.strokeStyle = '#d32f2f';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(200, 120);
-            ctx.lineTo(200, 220);
-            ctx.stroke();
-            
-            // Brazos
-            ctx.beginPath();
-            ctx.moveTo(200, 150);
-            ctx.lineTo(170, 180);
-            ctx.moveTo(200, 150);
-            ctx.lineTo(230, 180);
-            ctx.stroke();
-            
-            // Piernas
-            ctx.beginPath();
-            ctx.moveTo(200, 220);
-            ctx.lineTo(170, 270);
-            ctx.moveTo(200, 220);
-            ctx.lineTo(230, 270);
-            ctx.stroke();
-        }
-    }
-    
-    clearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-    
+
+    // Animación de sacudida
     shakeHangman() {
         const container = document.querySelector('.hangman-container');
         container.classList.add('shake');
-        setTimeout(() => {
-            container.classList.remove('shake');
-        }, 500);
+        setTimeout(() => container.classList.remove('shake'), 500);
     }
-    
+
+    // Actualizar display
     updateDisplay() {
         document.getElementById('score').textContent = this.score;
         document.getElementById('level').textContent = this.level;
         document.getElementById('errors').textContent = `${this.wrongGuesses}/${this.maxWrongGuesses}`;
-        
+
         // Estadísticas
         document.getElementById('words-guessed').textContent = this.stats.wordsGuessed;
         document.getElementById('best-score').textContent = this.stats.bestScore;
         document.getElementById('current-streak').textContent = this.stats.currentStreak;
-        
+
         const winPercentage = this.stats.totalWords > 0 
             ? Math.round((this.stats.wordsGuessed / this.stats.totalWords) * 100)
             : 0;
         document.getElementById('win-percentage').textContent = `${winPercentage}%`;
     }
-    
+
+    // Mostrar mensaje
     showMessage(text, type = 'info') {
         const messageElement = document.getElementById('game-message');
         messageElement.textContent = text;
         messageElement.className = `game-message ${type} show`;
-        
-        setTimeout(() => {
-            messageElement.classList.remove('show');
-        }, 4000);
+
+        setTimeout(() => messageElement.classList.remove('show'), 4000);
     }
-    
-    // Sonidos
-    playCorrectSound() {
-        this.playTone(800, 200, 'sine');
-    }
-    
-    playIncorrectSound() {
-        this.playTone(300, 400, 'square');
-    }
-    
+
+    // === MÉTODOS DE SONIDO ===
+
+    playCorrectSound() { this.playTone(800, 200, 'sine'); }
+    playIncorrectSound() { this.playTone(300, 400, 'square'); }
+
     playWinSound() {
-        const frequencies = [523, 659, 784, 1047]; // Do, Mi, Sol, Do alto
+        const frequencies = [523, 659, 784, 1047];
         frequencies.forEach((freq, index) => {
-            setTimeout(() => {
-                this.playTone(freq, 300, 'sine');
-            }, index * 150);
+            setTimeout(() => this.playTone(freq, 300, 'sine'), index * 150);
         });
     }
-    
+
     playLoseSound() {
         const frequencies = [400, 350, 300, 250];
         frequencies.forEach((freq, index) => {
-            setTimeout(() => {
-                this.playTone(freq, 200, 'square');
-            }, index * 100);
+            setTimeout(() => this.playTone(freq, 200, 'square'), index * 100);
         });
     }
-    
+
     playTone(frequency, duration, type = 'sine') {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.value = frequency;
             oscillator.type = type;
-            
+
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + duration / 1000);
         } catch (error) {
             console.log('Audio no disponible');
         }
     }
-    
-    // Configuración
+
+    // === MÉTODOS DE PERSISTENCIA ===
+
+    // Cargar datos del usuario
+    loadUserData() {
+        this.loadStats();
+        this.loadSettings();
+    }
+
+    // Guardar configuración
     saveSettings() {
         const settings = {
             difficulty: this.difficulty,
@@ -673,41 +735,50 @@ class Ahorcado {
         };
         localStorage.setItem('hangman_settings', JSON.stringify(settings));
     }
-    
+
+    // Cargar configuración
     loadSettings() {
         const saved = localStorage.getItem('hangman_settings');
-        if (saved) {
-            const settings = JSON.parse(saved);
-            this.difficulty = settings.difficulty || 'medium';
-            this.currentCategory = settings.category || 'animals';
-            this.soundEnabled = settings.soundEnabled !== false;
-            this.animationsEnabled = settings.animationsEnabled !== false;
-            
-            // Aplicar a los controles
-            document.getElementById('difficulty-select').value = this.difficulty;
-            document.getElementById('category-select').value = this.currentCategory;
-            document.getElementById('sound-toggle').checked = this.soundEnabled;
-            document.getElementById('animations-toggle').checked = this.animationsEnabled;
-        }
+        if (!saved) return;
+
+        const settings = JSON.parse(saved);
+        this.difficulty = settings.difficulty || 'medium';
+        this.currentCategory = settings.category || 'animals';
+        this.soundEnabled = settings.soundEnabled !== false;
+        this.animationsEnabled = settings.animationsEnabled !== false;
+
+        this.applySettingsToUI();
     }
-    
-    // Estadísticas
+
+    // Aplicar configuración a la interfaz
+    applySettingsToUI() {
+        document.getElementById('difficulty-select').value = this.difficulty;
+        document.getElementById('category-select').value = this.currentCategory;
+        document.getElementById('sound-toggle').checked = this.soundEnabled;
+        document.getElementById('animations-toggle').checked = this.animationsEnabled;
+    }
+
+    // Guardar estadísticas
     saveStats() {
         localStorage.setItem('hangman_stats', JSON.stringify(this.stats));
     }
-    
+
+    // Cargar estadísticas
     loadStats() {
         const saved = localStorage.getItem('hangman_stats');
         if (saved) {
             this.stats = { ...this.stats, ...JSON.parse(saved) };
         }
     }
-    
+
+    // === MÉTODOS DE API ===
+
+    // Actualizar estado de conexión
     updateConnectionStatus() {
         const statusIcon = document.getElementById('status-icon');
         const statusText = document.getElementById('status-text');
         const statusContainer = document.getElementById('connection-status');
-        
+
         if (window.apiClient && !window.apiClient.offlineMode) {
             statusIcon.textContent = '🟢';
             statusText.textContent = 'En línea';
@@ -718,22 +789,35 @@ class Ahorcado {
             statusContainer.className = 'connection-status offline';
         }
     }
-    
+
+    // Registrar actividad
+    async registerActivity() {
+        try {
+            if (window.apiClient) {
+                await window.apiClient.updateActivity('ahorcado');
+            }
+        } catch (error) {
+            console.log('No se pudo registrar actividad');
+        }
+    }
+
+    // Registrar inicio de juego
     async recordGameStart() {
         try {
             if (window.apiClient) {
                 await window.apiClient.updateActivity('ahorcado');
             }
         } catch (error) {
-            console.log('No se pudo registrar el inicio del juego');
+            console.log('No se pudo registrar inicio de juego');
         }
     }
-    
+
+    // Registrar resultado de juego
     async recordGameResult(won) {
         try {
             if (window.apiClient) {
                 await window.apiClient.recordGameResult('ahorcado', {
-                    won: won,
+                    won,
                     score: this.score,
                     level: this.level,
                     word: this.currentWord,
@@ -744,33 +828,34 @@ class Ahorcado {
                 });
             }
         } catch (error) {
-            console.log('No se pudo registrar el resultado del juego');
+            console.log('No se pudo registrar resultado');
         }
     }
 }
 
-// Función para mostrar/ocultar configuración
+// === FUNCIONES GLOBALES ===
+
 function toggleSettings() {
     const panel = document.getElementById('settings-panel');
     panel.classList.toggle('active');
 }
 
-// Función para volver al menú
 function volverAlMenu() {
     window.location.href = 'index.html';
 }
 
-// Inicializar el juego cuando se carga la página
+// === INICIALIZACIÓN ===
+
 let ahorcadoGame;
 
 document.addEventListener('DOMContentLoaded', () => {
     ahorcadoGame = new Ahorcado();
-    
+
     // Cerrar panel de configuración al hacer clic fuera
     document.addEventListener('click', (e) => {
         const panel = document.getElementById('settings-panel');
         const settingsButton = document.querySelector('.settings-button');
-        
+
         if (panel.classList.contains('active') && 
             !panel.contains(e.target) && 
             !settingsButton.contains(e.target)) {
