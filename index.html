@@ -9,13 +9,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="js/api-client.js"></script>
 </head>
-<body>    
-    <!-- Controles superiores -->
-    <div class="top-controls">
-        <div class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
-            <i class="fas fa-moon" id="theme-icon"></i>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-gamepad"></i>
+                <span>PSK Games</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ruleta.html" class="nav-link">
+                        <i class="fas fa-star"></i>
+                        Ruleta de Doble Vega
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="simon-dice.html" class="nav-link">
+                        <i class="fas fa-brain"></i>
+                        Simon Dice
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tateti.html" class="nav-link">
+                        <i class="fas fa-th"></i>
+                        Tateti
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ahorcado.html" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        Ahorcado
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-toggle" onclick="toggleNav()">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <div class="container">
         <div class="header-section">

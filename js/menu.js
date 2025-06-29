@@ -1,13 +1,3 @@
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    const menuInstance = window.menuInstance;
-    if (menuInstance) {
-        menuInstance.setTheme(newTheme);
-    }
-}
-
 function navigateTo(page) {
     // Incrementar contador de juegos jugados
     let gamesPlayed = parseInt(localStorage.getItem('psk_games_played') || '1234');
