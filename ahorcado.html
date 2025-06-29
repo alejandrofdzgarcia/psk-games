@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title data-i18n="hangman.page_title">Juego del Ahorcado - PSK Games</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
+    <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="estilos/ahorcado.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/ahorcado.js"></script>
+    <script src="js/api-client.js"></script>
+</head>
+<body>
+    <div class="navigation">
+        <button class="back-button" onclick="volverAlMenu()" data-i18n="nav.back">← Volver al Menú</button>
+    </div>
+
+    <div class="container">
+        <h1 data-i18n="hangman.title">🎯 Juego del Ahorcado</h1>
+        <p class="subtitle" data-i18n="hangman.description">Adivina la palabra antes de que se complete el dibujo</p>
+        
+        <!-- Indicador de estado de conexión -->
+        <div id="connection-status" class="connection-status">
+            <span id="status-icon">🔄</span>
+            <span id="status-text" data-i18n="status.connecting">Conectando...</span>
+        </div>
+
+        <!-- Panel de información del juego -->
+        <div class="game-info">
+            <div class="info-item">
+                <span data-i18n="hangman.score">Puntuación:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="hangman.level">Nivel:</span>
+                <span id="level">1</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="hangman.errors">Errores:</span>
+                <span id="errors">0/6</span>
+            </div>
+            <div class="info-item">
+                <span data-i18n="hangman.category">Categoría:</span>
+                <span id="current-category">Animales</span>
+            </div>
+        </div>
+
+        <!-- Canvas para el dibujo del ahorcado -->
+        <div class="hangman-container">
+            <canvas id="hangman-canvas" width="300" height="350"></canvas>
+        </div>
+
+        <!-- Palabra a adivinar -->
+        <div class="word-container">
+            <div id="word-display" class="word-display"></div>
+            <div id="word-hint" class="word-hint"></div>
+        </div>
+
+        <!-- Teclado virtual -->
+        <div class="keyboard" id="keyboard"></div>
+
+        <!-- Controles del juego -->
+        <div class="game-controls">
+            <button class="control-button start-button" id="start-game" data-i18n="hangman.new_game">Nueva Palabra</button>
+            <button class="control-button hint-button" id="get-hint" data-i18n="hangman.hint">Pista (-10 pts)</button>
+            <button class="control-button reset-button" id="reset-game" data-i18n="hangman.reset">Reiniciar Juego</button>
+            <button class="control-button settings-button" onclick="toggleSettings()" data-i18n="hangman.settings">Configuración</button>
+        </div>
+
+        <!-- Panel de configuración -->
+        <div class="settings-panel" id="settings-panel">
+            <h3 data-i18n="hangman.settings_title">Configuración</h3>
+            <div class="setting-item">
+                <label data-i18n="hangman.difficulty">Dificultad:</label>
+                <select id="difficulty-select">
+                    <option value="easy" data-i18n="hangman.easy">Fácil</option>
+                    <option value="medium" data-i18n="hangman.medium" selected>Medio</option>
+                    <option value="hard" data-i18n="hangman.hard">Difícil</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="hangman.category">Categoría:</label>
+                <select id="category-select">
+                    <option value="all" data-i18n="hangman.all_categories">Todas</option>
+                    <option value="animals" data-i18n="hangman.animals">Animales</option>
+                    <option value="countries" data-i18n="hangman.countries">Países</option>
+                    <option value="food" data-i18n="hangman.food">Comida</option>
+                    <option value="objects" data-i18n="hangman.objects">Objetos</option>
+                    <option value="professions" data-i18n="hangman.professions">Profesiones</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="hangman.sound">Sonido:</label>
+                <input type="checkbox" id="sound-toggle" checked>
+            </div>
+            <div class="setting-item">
+                <label data-i18n="hangman.animations">Animaciones:</label>
+                <input type="checkbox" id="animations-toggle" checked>
+            </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <div class="game-message" id="game-message"></div>
+
+        <!-- Panel de estadísticas -->
+        <div class="stats-panel">
+            <h3 data-i18n="hangman.statistics">Estadísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="words-guessed">0</span>
+                    <span class="stat-label" data-i18n="hangman.words_guessed">Palabras Adivinadas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="best-score">0</span>
+                    <span class="stat-label" data-i18n="hangman.best_score">Mejor Puntuación</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="win-percentage">0%</span>
+                    <span class="stat-label" data-i18n="hangman.win_percentage">Porcentaje de Acierto</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="current-streak">0</span>
+                    <span class="stat-label" data-i18n="hangman.current_streak">Racha Actual</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/menu.js"></script>
+    <script src="js/ahorcado.js"></script>
+</body>
+</html>
