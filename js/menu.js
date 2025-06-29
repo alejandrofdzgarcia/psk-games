@@ -44,7 +44,6 @@ class MenuPrincipal {
         this.updateVisitCounter();
         this.initEventListeners();
         this.initAnimations();
-        this.createFloatingParticles();
         this.initTheme();
         this.simulateOnlineUsers();
         this.loadStatsFromAPI();
@@ -273,29 +272,6 @@ class MenuPrincipal {
                 topControls.style.opacity = '1';
                 topControls.style.transform = 'translateX(0)';
             }, 500);
-        }
-    }
-
-    createFloatingParticles() {
-        const container = document.querySelector('.floating-particles');
-        const particleCount = 30;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'floating-particle';
-            
-            // Posición aleatoria
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 15 + 's';
-            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            
-            // Tamaño y opacidad aleatoria
-            const size = Math.random() * 4 + 2;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.opacity = Math.random() * 0.5 + 0.2;
-            
-            container.appendChild(particle);
         }
     }
 }
