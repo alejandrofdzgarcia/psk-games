@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title data-i18n="roulette.page_title">Ruleta Personalizada - Ruleta de la Suerte</title>
+    <title>Ruleta Personalizada - Ruleta de la Suerte</title>
     <link rel="stylesheet" href="estilos/ruleta-styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
     <link rel="stylesheet" href="estilos/styles.css">
-    <script src="js/i18n.js"></script>
     <script src="js/api-client.js"></script>
 </head>
 <body>
     <div class="navigation">
-        <button class="back-button" onclick="volverAlMenu()" data-i18n="nav.back">← Volver al Menú</button>
+        <button class="back-button" onclick="volverAlMenu()">← Volver al Menú</button>
     </div>
 
     <div class="container">
-        <h1 data-i18n="roulette.title">🎲 Ruleta de Doble Vega</h1>
-        <p class="subtitle" data-i18n="roulette.description">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
+        <h1>🎲 Ruleta de Doble Vega</h1>
+        <p class="subtitle">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
         
         <!-- Indicador de estado de conexión -->
         <div id="connection-status" class="connection-status">
             <span id="status-icon">🔄</span>
-            <span id="status-text" data-i18n="status.connecting">Conectando...</span>
+            <span id="status-text">Conectando...</span>
         </div>
         
         <div class="wheel-container">
@@ -33,14 +32,14 @@
         </div>
 
         <div class="controls">
-            <button class="spin-button" id="spinButton" data-i18n="roulette.spin">¡GIRAR RULETA!</button>
+            <button class="spin-button" id="spinButton">¡GIRAR RULETA!</button>
         </div>
 
         <div class="result" id="result"></div>
         
         <!-- Tablero de Apuestas -->
         <div id="betting-container" class="betting-container">
-            <h3 data-i18n="roulette.betting_table">Mesa de Apuestas</h3>
+            <h3>Mesa de Apuestas</h3>
             <div id="betting_board" class="betting-board"></div>
         </div>
     </div>

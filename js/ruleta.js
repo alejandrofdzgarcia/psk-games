@@ -264,7 +264,7 @@ class Ruleta {
         this.ctx.font = '18px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        const mensaje = window.i18n ? window.i18n.t('roulette.ready') : 'Ruleta de Casino Lista';
+        const mensaje = 'Ruleta de Casino Lista';
         this.ctx.fillText(mensaje, this.centerX, this.centerY);
     }
 
@@ -306,8 +306,7 @@ class Ruleta {
         const result = document.getElementById('result');
         
         spinButton.disabled = true;
-        const spinningText = window.i18n ? window.i18n.t('roulette.spinning') : 'Girando...';
-        spinButton.textContent = spinningText;
+        spinButton.textContent = 'Girando...';
         result.textContent = '';
         result.classList.remove('winner-animation');
 
@@ -382,16 +381,16 @@ class Ruleta {
         
         if (ganador === "0") {
             mensajeColor = '#00AA00'; // Verde
-            resultText = window.i18n ? window.i18n.t('roulette.winner_green', ganador) : `🎉 ¡${ganador} - VERDE! 🎉`;
+            resultText = `🎉 ¡${ganador} - VERDE! 🎉`;
         } else {
             // Obtener el color basado en la posición del número ganador
             const colorGanador = this.colores[indiceGanador];
             if (colorGanador === '#DC143C') {
                 mensajeColor = '#DC143C'; // Rojo
-                resultText = window.i18n ? window.i18n.t('roulette.winner_red', ganador) : `🎉 ¡${ganador} - ROJO! 🎉`;
+                resultText = `🎉 ¡${ganador} - ROJO! 🎉`;
             } else {
                 mensajeColor = '#1A1A1A'; // Negro
-                resultText = window.i18n ? window.i18n.t('roulette.winner_black', ganador) : `🎉 ¡${ganador} - NEGRO! 🎉`;
+                resultText = `🎉 ¡${ganador} - NEGRO! 🎉`;
             }
         }
 
@@ -419,8 +418,7 @@ class Ruleta {
         this.girando = false;
         const spinButton = document.getElementById('spinButton');
         spinButton.disabled = false;
-        const spinText = window.i18n ? window.i18n.t('roulette.spin') : '¡GIRAR RULETA!';
-        spinButton.textContent = spinText;
+        spinButton.textContent = '¡GIRAR RULETA!';
     }
 
     // Método para guardar el resultado del giro en la API
@@ -509,12 +507,12 @@ class Ruleta {
         
         const color = this.colores[indice];
         if (numero === "0") {
-            return window.i18n ? window.i18n.t('color.green') : "Verde";
+            return "Verde";
         }
         if (color === '#DC143C') {
-            return window.i18n ? window.i18n.t('color.red') : "Rojo";
+            return "Rojo";
         } else {
-            return window.i18n ? window.i18n.t('color.black') : "Negro";
+            return "Negro";
         }
     }
 

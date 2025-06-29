@@ -508,10 +508,6 @@ body {
     .winner-animation {
         animation: none;
     }
-    
-    [data-i18n] {
-        transition: none;
-    }
 }
 
 /* Alto contraste para accesibilidad */
@@ -703,15 +699,6 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* Animación suave para cambios de idioma */
-[data-i18n] {
-    transition: opacity 0.2s ease;
-}
-
-[data-i18n].updating {
-    opacity: 0.7;
 }
 
 /* Variables CSS para tema */
@@ -1322,10 +1309,6 @@ h1 {
     .winner-animation {
         animation: none;
     }
-    
-    [data-i18n] {
-        transition: none;
-    }
 }
 
 /* Alto contraste para accesibilidad */
@@ -1517,15 +1500,6 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* Animación suave para cambios de idioma */
-[data-i18n] {
-    transition: opacity 0.2s ease;
-}
-
-[data-i18n].updating {
-    opacity: 0.7;
 }
 
 /* Variables CSS para tema */

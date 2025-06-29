@@ -1,12 +1,3 @@
-// Funciones globales definidas al inicio para estar disponibles inmediatamente
-function changeLanguage(lang) {
-    // Aquí se integraría con el sistema i18n existente
-    if (window.i18n && typeof window.i18n.setLanguage === 'function') {
-        window.i18n.setLanguage(lang);
-    }
-    localStorage.setItem('psk_language', lang);
-}
-
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';

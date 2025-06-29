@@ -66,7 +66,6 @@
     <div class="test-container">
         <h2>📱 Test de Funcionalidades</h2>
         <button onclick="testLocalStorage()">Test localStorage</button>
-        <button onclick="testI18n()">Test Idiomas</button>
         <button onclick="testOfflineMode()">Test Modo Offline</button>
         <div id="functionality-results"></div>
     </div>
@@ -87,7 +86,6 @@
             environment: null,
             api: null,
             localStorage: null,
-            i18n: null,
             offline: null,
             roulette: null
         };
@@ -191,26 +189,6 @@
             } catch (error) {
                 resultsDiv.innerHTML += '<div class="status error">❌ localStorage no disponible: ' + error.message + '</div>';
                 testResults.localStorage = false;
-            }
-            
-            updateSummary();
-        }
-
-        // Test de internacionalización
-        function testI18n() {
-            const resultsDiv = document.getElementById('functionality-results');
-            
-            try {
-                // Verificar si el archivo i18n.js está cargado
-                if (typeof window.changeLanguage === 'function') {
-                    resultsDiv.innerHTML += '<div class="status success">✅ Sistema de idiomas disponible</div>';
-                    testResults.i18n = true;
-                } else {
-                    throw new Error('Función changeLanguage no encontrada');
-                }
-            } catch (error) {
-                resultsDiv.innerHTML += '<div class="status error">❌ Sistema de idiomas no disponible: ' + error.message + '</div>';
-                testResults.i18n = false;
             }
             
             updateSummary();
@@ -320,7 +298,6 @@
                 setTimeout(() => {
                     testApiConnectivity();
                     testLocalStorage();
-                    testI18n();
                     testOfflineMode();
                     testRouletteFiles();
                 }, 1000);

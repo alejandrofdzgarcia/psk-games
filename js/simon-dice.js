@@ -122,7 +122,7 @@ class SimonDice {
         this.level = 1;
         this.score = 0;
         this.updateDisplay();
-        this.showMessage(window.i18n ? window.i18n.t('simon.starting') : 'Comenzando...', 'info');
+        this.showMessage('Comenzando...', 'info');
         
         this.startButton.disabled = true;
         this.disableButtons();
@@ -144,7 +144,7 @@ class SimonDice {
     async showSequence() {
         this.isShowingSequence = true;
         this.currentSequenceIndex = 0;
-        this.showMessage(window.i18n ? window.i18n.t('simon.watch') : 'Observa la secuencia...', 'info');
+        this.showMessage('Observa la secuencia...', 'info');
         
         const delay = this.getSequenceDelay();
         
@@ -156,7 +156,7 @@ class SimonDice {
         this.isShowingSequence = false;
         this.enableButtons();
         this.playerSequence = [];
-        this.showMessage(window.i18n ? window.i18n.t('simon.your_turn') : 'Tu turno...', 'success');
+        this.showMessage('Tu turno...', 'success');
     }
 
     async lightButton(buttonIndex) {
@@ -192,7 +192,7 @@ class SimonDice {
             this.updateDisplay();
             
             this.disableButtons();
-            this.showMessage(window.i18n ? window.i18n.t('simon.correct') : '¡Correcto!', 'success');
+            this.showMessage('¡Correcto!', 'success');
             
             setTimeout(() => {
                 this.addToSequence();
@@ -206,9 +206,7 @@ class SimonDice {
         this.gameStarted = false;
         this.disableButtons();
         
-        const message = window.i18n ? 
-            window.i18n.t('simon.game_over').replace('{level}', this.level) : 
-            `¡Juego terminado! Llegaste al nivel ${this.level}`;
+        const message =  `¡Juego terminado! Llegaste al nivel ${this.level}`;
         
         this.showMessage(message, 'error');
         
@@ -219,7 +217,7 @@ class SimonDice {
             this.updateDisplay();
             
             setTimeout(() => {
-                this.showMessage(window.i18n ? window.i18n.t('simon.new_record') : '¡Nueva mejor puntuación!', 'success');
+                this.showMessage('¡Nueva mejor puntuación!', 'success');
             }, 2000);
         }
         
@@ -346,11 +344,11 @@ class SimonDice {
         
         if (window.apiClient && !window.apiClient.offlineMode) {
             statusIcon.textContent = '🟢';
-            statusText.textContent = window.i18n ? window.i18n.t('status.online') : 'En línea';
+            statusText.textContent = 'En línea';
             statusContainer.className = 'connection-status online';
         } else {
             statusIcon.textContent = '🔴';
-            statusText.textContent = window.i18n ? window.i18n.t('status.offline') : 'Modo offline';
+            statusText.textContent ='Modo offline';
             statusContainer.className = 'connection-status offline';
         }
     }
