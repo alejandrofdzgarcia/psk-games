@@ -929,93 +929,125 @@ body > div.navigation > button::before {
     }
 }
 
-/* Orientación landscape en móviles */
-@media (max-width: 48rem) and (orientation: landscape) { /* 768px landscape */
+/* Ocultar completamente la navegación en dispositivos móviles y tablets */
+@media (max-width: 64rem) { /* 1024px - tablets y móviles */
+    .navbar {
+        display: none !important;
+    }
+    
+    .nav-container {
+        display: none !important;
+    }
+    
+    .nav-menu {
+        display: none !important;
+    }
+    
+    .nav-toggle {
+        display: none !important;
+    }
+    
+    /* Ajustar el contenido para que no quede espacio vacío */
     body {
-        min-height: 100vh;
-        justify-content: flex-start;
-        padding-top: 1.25rem;
+        padding-top: 0;
+        margin-top: 0;
     }
     
+    /* Ajustar el botón de navegación para que esté más cerca del borde superior */
+    body > div.navigation > button {
+        top: 1rem; /* Reducir distancia del top ya que no hay navbar */
+        left: 1rem;
+        position: fixed;
+        z-index: 1001;
+    }
+}
+
+@media (max-width: 48rem) { /* 768px - móviles */
+    .navbar, .nav-container, .nav-menu, .nav-toggle {
+        display: none !important;
+    }
+    
+    /* Optimizar el botón de navegación para móviles */
+    body > div.navigation > button {
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-size: var(--font-size-sm);
+        border-radius: var(--border-radius-md);
+    }
+    
+    /* Asegurar que el contenido principal tenga espacio completo */
     .container {
-        margin: 1.25rem 0;
+        margin-top: 0;
+        padding-top: var(--space-md);
     }
     
-    h1 {
-        font-size: 1.8em;
-        margin-bottom: 0.9375rem;
-    }
-    
-    .subtitle {
-        margin-bottom: 1.25rem;
-    }
-    
-    .menu-grid {
-        margin: 1.25rem 0;
-    }
-    
-    .footer {
-        margin-top: 1.25rem;
-    }
-    
-    .wheel {
-        width: 18.75rem;
-        height: 18.75rem;
+    /* Ajustar el selector de idioma para que no interfiera */
+    .language-selector {
+        top: 0.5rem;
+        right: 0.5rem;
+        z-index: 1002; /* Mayor que el botón de navegación */
     }
 }
 
-/* Mejoras para touch en dispositivos móviles */
-@media (hover: none) and (pointer: coarse) {
-    .menu-card {
-        /* Eliminar hover effects en dispositivos touch */
-        transition: var(--transition-fast);
+@media (max-width: 30rem) { /* 480px - móviles pequeños */
+    .navbar, .nav-container, .nav-menu, .nav-toggle {
+        display: none !important;
     }
     
-    .menu-card:active {
-        transform: scale(0.98);
-        background: var(--hover-bg);
+    /* Botón de navegación más pequeño para pantallas muy pequeñas */
+    body > div.navigation > button {
+        top: 0.25rem;
+        left: 0.25rem;
+        padding: 0.375rem 0.625rem;
+        font-size: 0.75rem;
+        min-height: 2.5rem;
+        min-width: 2.5rem;
     }
     
-    .card-button:active {
-        transform: scale(0.95);
-    }
-    
-    /* Aumentar área de toque */
-    .language-selector select {
-        min-height: 2.75rem;
-        min-width: 2.75rem;
-    }
-}
-
-/* Accesibilidad - Reducir movimiento para usuarios sensibles */
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        transition: none !important;
-        animation: none !important;
-    }
-    
-    .menu-card:hover {
-        transform: none;
-    }
-}
-
-/* Alto contraste para accesibilidad */
-@media (prefers-contrast: high) {
-    .menu-card {
-        border: 0.1875rem solid var(--white-color);
-        background: var(--dark-bg);
-        color: var(--white-color);
-    }
-    
-    .card-button {
-        border: 0.125rem solid var(--white-color);
-        background: var(--black-color);
-        color: var(--white-color);
+    /* Selector de idioma más pequeño */
+    .language-selector {
+        top: 0.25rem;
+        right: 0.25rem;
     }
     
     .language-selector select {
-        border: 0.1875rem solid var(--white-color);
-        background: var(--black-color);
-        color: var(--white-color);
+        padding: 0.25rem 0.375rem;
+        font-size: 0.625rem;
+        min-height: 2.5rem;
+        min-width: 2.5rem;
+    }
+}
+
+/* Para tablets en orientación landscape, también ocultar navegación */
+@media (max-width: 64rem) and (orientation: landscape) {
+    .navbar, .nav-container, .nav-menu, .nav-toggle {
+        display: none !important;
+    }
+    
+    body > div.navigation > button {
+        top: 0.75rem;
+        left: 0.75rem;
+    }
+}
+
+/* Asegurar que en desktop sí se muestre la navegación */
+@media (min-width: 64.0625rem) { /* 1025px y mayores - desktop */
+    .navbar {
+        display: block !important;
+    }
+    
+    .nav-container {
+        display: flex !important;
+    }
+    
+    .nav-menu {
+        display: flex !important;
+    }
+    
+    /* El botón de navegación mantiene su posición original en desktop */
+    body > div.navigation > button {
+        top: 5rem; /* Vuelve a la posición debajo del navbar */
+        left: 1rem;
     }
 }
