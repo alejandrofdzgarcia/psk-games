@@ -85,6 +85,142 @@ const player = {
     score: 0
 };
 
+// Añade estas variables globales
+let difficultyLevel = 'normal'; // opciones: 'easy', 'normal', 'hard'
+let gameStarted = false;
+
+// Modifica la función initGame para mostrar primero el panel de configuración
+function initGame() {
+    // Crear y configurar el canvas
+    canvas = document.createElement('canvas');
+    canvas.width = BLOCK_SIZE * BOARD_WIDTH;
+    canvas.height = BLOCK_SIZE * BOARD_HEIGHT;
+    canvas.id = 'tetris-canvas';
+    ctx = canvas.getContext('2d');
+
+    // Crear contenedor del juego
+    const gameContainer = document.createElement('div');
+    gameContainer.className = 'game-container';
+
+    // Crear panel para mostrar puntuación y nivel
+    const scorePanel = document.createElement('div');
+    scorePanel.className = 'score-panel';
+    scorePanel.innerHTML = `
+        <div class="score">Puntuación<span id="score">0</span></div>
+        <div class="level">Nivel<span id="level">1</span></div>
+    `;
+
+    // Controles en pantalla para dispositivos móviles
+    const mobileControls = document.createElement('div');
+    mobileControls.className = 'mobile-controls';
+    mobileControls.innerHTML = `
+        <button id="left-btn" class="control-btn">←</button>
+        <button id="rotate-btn" class="control-btn">↻</button>
+        <button id="right-btn" class="control-btn">→</button>
+        <button id="down-btn" class="control-btn">↓</button>
+        <button id="hard-drop-btn" class="control-btn hard-drop-btn">CAÍDA RÁPIDA</button>
+    `;
+
+    // Añadir título
+    const title = document.createElement('h1');
+    title.textContent = 'TETRIS';
+    title.className = 'game-title';
+
+    // Añadir elementos al contenedor
+    gameContainer.appendChild(title);
+    gameContainer.appendChild(scorePanel);
+    gameContainer.appendChild(canvas);
+    gameContainer.appendChild(mobileControls);
+
+    // Añadir contenedor a la página
+    document.body.appendChild(gameContainer);
+
+    // Crear y añadir el panel de configuración
+    createConfigPanel(gameContainer);
+
+    // Configurar los controles
+    setupControls();
+}
+
+// Función para crear el panel de configuración
+function createConfigPanel(gameContainer) {
+    const configPanel = document.createElement('div');
+    configPanel.className = 'config-panel';
+    configPanel.id = 'config-panel';
+    
+    configPanel.innerHTML = `
+        <div class="config-content">
+            <h2 class="config-title">CONFIGURACIÓN</h2>
+            <div class="difficulty-options">
+                <button class="difficulty-btn" data-difficulty="easy">Fácil</button>
+                <button class="difficulty-btn selected" data-difficulty="normal">Normal</button>
+                <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+            </div>
+            <button class="start-game-btn">¡JUGAR!</button>
+        </div>
+    `;
+    
+    gameContainer.appendChild(configPanel);
+    
+    // Agregar eventos a los botones de dificultad
+    const difficultyBtns = configPanel.querySelectorAll('.difficulty-btn');
+    difficultyBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Quitar la clase selected de todos los botones
+            difficultyBtns.forEach(b => b.classList.remove('selected'));
+            // Añadir la clase selected al botón clickeado
+            this.classList.add('selected');
+            // Guardar la dificultad seleccionada
+            difficultyLevel = this.getAttribute('data-difficulty');
+        });
+    });
+    
+    // Agregar evento al botón de inicio
+    const startBtn = configPanel.querySelector('.start-game-btn');
+    startBtn.addEventListener('click', function() {
+        // Ocultar el panel de configuración
+        configPanel.style.display = 'none';
+        // Iniciar el juego con la dificultad seleccionada
+        startGame();
+    });
+}
+
+// Nueva función para iniciar el juego con la dificultad seleccionada
+function startGame() {
+    // Configurar la dificultad
+    setDifficulty(difficultyLevel);
+    
+    // Inicializar la pieza
+    playerReset();
+    
+    // Marcar el juego como iniciado
+    gameStarted = true;
+    
+    // Iniciar el bucle del juego
+    update();
+}
+
+// Función para establecer la dificultad
+function setDifficulty(level) {
+    switch(level) {
+        case 'easy':
+            level = 1;
+            dropSpeed = 1200;
+            break;
+        case 'normal':
+            level = 3;
+            dropSpeed = 800;
+            break;
+        case 'hard':
+            level = 5;
+            dropSpeed = 500;
+            break;
+    }
+    
+    // Actualizar nivel en pantalla
+    document.getElementById('level').textContent = level;
+}
+
 // Función para inicializar el juego
 function initGame() {
     // Crear y configurar el canvas
@@ -131,14 +267,11 @@ function initGame() {
     // Añadir contenedor a la página
     document.body.appendChild(gameContainer);
 
-    // Inicializar la pieza
-    playerReset();
+    // Crear y añadir el panel de configuración
+    createConfigPanel(gameContainer);
 
     // Configurar los controles
     setupControls();
-
-    // Iniciar el bucle del juego
-    update();
 }
 
 // Dibujar el tablero de juego
@@ -264,11 +397,16 @@ function playerReset() {
             dropSpeed = 1000;
             updateScore();
             gameOver = false;
+            gameStarted = false; // Resetear estado del juego
             
             // Eliminar clase de game over
             document.querySelector('.game-title').classList.remove('game-over');
             
-            frameId = requestAnimationFrame(update);
+            // Mostrar panel de configuración de nuevo
+            const configPanel = document.getElementById('config-panel');
+            if (configPanel) {
+                configPanel.style.display = 'flex';
+            }
         }, 500);
     }
 }
@@ -405,7 +543,7 @@ function setupControls() {
 
 // Función para actualizar el juego
 function update(time = 0) {
-    if (gameOver) return;
+    if (gameOver || !gameStarted) return;
     
     const deltaTime = time - lastTime;
     lastTime = time;
