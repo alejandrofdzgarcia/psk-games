@@ -9,7 +9,6 @@
     <script src="js/api-client.js"></script>
 </head>
 <body>
-    <!-- Barra de navegación -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -43,8 +42,14 @@
                 </li>
                 <li class="nav-item">
                     <a href="ahorcado.html" class="nav-link">
-                        <i class="fas fa-cog"></i>
+                        <i class="fas fa-skull"></i>
                         Ahorcado
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tetris.html" class="nav-link">
+                        <i class="fas fa-cubes"></i>
+                        Tetris
                     </a>
                 </li>
             </ul>
@@ -105,20 +110,20 @@
 
             <div class="menu-card" onclick="navigateTo('ahorcado.html')">
                 <div class="card-icon">
-                    <i class="fas fa-cog"></i>
+                    <i class="fas fa-skull"></i>
                 </div>
                 <h3>Ahorcado</h3>
                 <p>El mítico juego del ahorcado</p>
                 <div class="card-button">Jugar</div>
             </div>
 
-            <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">
+            <div class="menu-card" onclick="navigateTo('tetris.html')">
                 <div class="card-icon">
-                    <i class="fas fa-running"></i>
+                    <i class="fas fa-cubes"></i>
                 </div>
-                <h3>Ruleta de Actividades</h3>
-                <p>Esta opción está en desarrollo</p>
-                <div class="card-button">En desarrollo</div>
+                <h3>Tetris</h3>
+                <p>El mundialmente conocido y jugado juego del tetris</p>
+                <div class="card-button">Jugar</div>
             </div>
 
             <div class="menu-card" onclick="alert('Esta opción está en desarrollo')">

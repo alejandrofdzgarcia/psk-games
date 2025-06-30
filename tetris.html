@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Ruleta Personalizada - Ruleta de la Suerte</title>
-    <link rel="stylesheet" href="estilos/ruleta-styles.css">
+    <title>Tetris - PSK Games</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="multimedia/favicon.ico">
     <link rel="stylesheet" href="estilos/styles.css">
+    <link rel="stylesheet" href="estilos/tetris.css">
     <script src="js/api-client.js"></script>
 </head>
 <body>
@@ -24,7 +24,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="ruleta.html" class="nav-link active">
+                    <a href="ruleta.html" class="nav-link">
                         <i class="fas fa-star"></i>
                         Ruleta de Doble Vega
                     </a>
@@ -48,7 +48,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="tetris.html" class="nav-link">
+                    <a href="tetris.html" class="nav-link active">
                         <i class="fas fa-cubes"></i>
                         Tetris
                     </a>
@@ -66,38 +66,7 @@
         <button class="back-button" onclick="volverAlMenu()">← Volver al Menú</button>
     </div>
 
-    <div class="container">
-        <h1>🎲 Ruleta de Doble Vega</h1>
-        <p class="subtitle">Esta ruleta solo es apta para ludópatas (véase Vega Vega)</p>
-        
-        <!-- Indicador de estado de conexión -->
-        <div id="connection-status" class="connection-status">
-            <span id="status-icon">🔄</span>
-            <span id="status-text">Conectando...</span>
-        </div>
-        
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <canvas id="wheelCanvas" width="400" height="400" class="wheel-canvas">
-                Tu navegador no soporta canvas. Por favor usa un navegador más moderno.
-            </canvas>
-        </div>
-
-        <div class="controls">
-            <button class="spin-button" id="spinButton">¡GIRAR RULETA!</button>
-        </div>
-
-        <div class="result" id="result"></div>
-        
-        <!-- Tablero de Apuestas -->
-        <div id="betting-container" class="betting-container">
-            <h3>Mesa de Apuestas</h3>
-            <div id="betting_board" class="betting-board"></div>
-        </div>
-    </div>
-
     <script src="js/menu.js"></script>
-    <script src="js/ruleta.js"></script>
-    <script src="js/stats-manager.js"></script>
+    <script src="js/tetris.js"></script>
 </body>
 </html>

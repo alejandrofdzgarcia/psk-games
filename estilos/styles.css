@@ -672,13 +672,14 @@ body > div.navigation > button {
     align-items: center;
     gap: 0.5rem;
     box-shadow: var(--shadow-sm);
-    position: relative;
+    position: fixed; /* Cambiado de relative a fixed */
     overflow: hidden;
-    z-index: 10;
-    top: 0.625rem;
-    left: 0.625rem;
+    z-index: 1001; /* Mayor que el navbar para asegurar visibilidad */
+    top: 5rem; /* Posición vertical debajo del navbar */
+    left: 1rem; /* Margen desde el borde izquierdo */
 }
 
+/* El resto de las propiedades del botón se mantienen igual */
 body > div.navigation > button::before {
     content: '';
     position: absolute;
@@ -689,22 +690,6 @@ body > div.navigation > button::before {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: var(--transition-slow);
     z-index: -1;
-}
-
-body > div.navigation > button:hover {
-    transform: translateY(-0.125rem);
-    box-shadow: var(--shadow-md);
-    border-color: rgba(255, 255, 255, 0.4);
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-}
-
-body > div.navigation > button:hover::before {
-    left: 100%;
-}
-
-body > div.navigation > button:active {
-    transform: translateY(0.0625rem);
-    box-shadow: var(--shadow-sm);
 }
 
 /* Media queries para responsividad */
